@@ -1,4 +1,4 @@
-package com.example.calpick.domain;
+package com.example.calpick.domain.entity;
 
 import jakarta.persistence.Id;
 import lombok.*;
