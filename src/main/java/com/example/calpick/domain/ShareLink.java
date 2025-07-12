@@ -1,0 +1,23 @@
+package com.example.calpick.domain;
+
+import jakarta.persistence.Id;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ShareLink {
+    @Id
+    private Long shareLinkId;
+    private Long userId;
+    private String shareToken;
+    private LocalDateTime visible_start_date;
+    private LocalDateTime visible_end_date;
+    private LocalDateTime expires_at;
+    private LocalDateTime created_at;
+    private String link_status;
+}
