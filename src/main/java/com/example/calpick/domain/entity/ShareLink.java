@@ -1,6 +1,6 @@
 package com.example.calpick.domain.entity;
 
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,8 +10,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
+@Table(name = "share_link")
 public class ShareLink {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long shareLinkId;
     private Long userId;
     private String shareToken;

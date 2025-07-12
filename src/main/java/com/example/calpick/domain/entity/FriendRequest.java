@@ -1,6 +1,6 @@
 package com.example.calpick.domain.entity;
 
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,8 +10,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
+@Table(name = "friend_request")
 public class FriendRequest {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long friendRequestId;
     private Long requesterId;
     private Long receiverId;
