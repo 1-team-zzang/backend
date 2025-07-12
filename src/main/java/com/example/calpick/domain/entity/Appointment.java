@@ -18,9 +18,18 @@ public class Appointment {
     private LocalDateTime endAt;
     private String requesterName;
     private String requesterEmail;
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus appointmentStatus;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Boolean isAllDay;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requester_id")
+    private User requester;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
 }

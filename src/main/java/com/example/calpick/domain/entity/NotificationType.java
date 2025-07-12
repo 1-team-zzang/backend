@@ -12,4 +12,7 @@ public class NotificationType {
     @Enumerated(EnumType.STRING)
     private com.example.calpick.domain.entity.enums.NotificationType type;
     private Long referenceId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notification_id")
+    private Notification notification;
 }

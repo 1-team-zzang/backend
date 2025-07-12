@@ -1,4 +1,6 @@
 package com.example.calpick.domain.entity;
+import com.example.calpick.domain.entity.enums.LoginType;
+import com.example.calpick.domain.entity.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,10 +20,15 @@ public class User {
     private String email;
     private String password;
     private String name;
-    private String profile_url;
-    private String user_status;
-    private String login_type;
-    private LocalDateTime created_at;
-    private LocalDateTime modified_at;
-    private LocalDateTime deleted_at;
+    private String profileUrl;
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
+    private LocalDateTime deletedAt;
 }

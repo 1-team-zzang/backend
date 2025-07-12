@@ -25,4 +25,12 @@ public class Schedule {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "appointment_id")
+    private Appointment appointment;
+
 }

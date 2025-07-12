@@ -14,9 +14,14 @@ import java.time.LocalDateTime;
 @Table(name = "friendship")
 public class Friendship {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long friendshipId;
-    private Long userId;
-    private Long friendId;
-    private LocalDateTime created_at;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "friend_id")
+    private User friend;
+    private LocalDateTime createdAt;
 }
