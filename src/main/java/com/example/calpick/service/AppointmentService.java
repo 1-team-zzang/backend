@@ -7,8 +7,6 @@ import com.example.calpick.domain.dto.response.AppointmentRequestsDto;
 import com.example.calpick.domain.entity.*;
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
-import com.example.calpick.domain.entity.enums.NotificationStatus;
-import com.example.calpick.domain.entity.enums.Visibility;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
 import com.example.calpick.repository.*;
@@ -43,10 +41,7 @@ public class AppointmentService {
         Long userId = 2L;
         User user = userRepository.findById(userId).get(); //회원일때
         User receiver = userRepository.findById(dto.getReceiverId()).get();
-        //이미지??
-        //종일일때 시작시간 - 그날 끝까지
-        //종일 아닐때 시작시간- 종료시간
-        //회원일때, 비회원일때(name,email)
+
         if(dto.getIsAllDay()){ //종일 일때
             LocalDate date = dto.getStartAt().toLocalDate();
             dto.setEndAt(date.atTime(23, 59));
@@ -65,6 +60,7 @@ public class AppointmentService {
         }
 
         Appointment appointment = modelMapper.map(dto, Appointment.class);
+        appointment.setRequester(null);
         appointment.setAppointmentId(null);
         appointment.setAppointmentStatus(AppointmentStatus.REQUESTED);
         if(dto.requesterEmail.isEmpty()){ //요청자가 회원일경우
@@ -76,7 +72,6 @@ public class AppointmentService {
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
-        System.out.println("savedAppointment: "+savedAppointment.getAppointmentId()+"-----------------------");
 
         //수신자에게 신청 알람 메일 전송
         Notification notification = Notification.of(savedAppointment,NotificationEvent.REQUEST,dto.content);
