@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashMap;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class Response<T> {
         return new Response<>(200, "success", data);
     }
 
-    public static Response<Void> success() {
-        return new Response<>(200, "success", null);
+    public static Response<Object> success() {
+        return new Response<>(200, "success",  new LinkedHashMap<>());
     }
 }

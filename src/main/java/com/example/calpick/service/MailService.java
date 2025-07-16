@@ -1,0 +1,77 @@
+package com.example.calpick.service;
+
+import com.example.calpick.domain.entity.Notification;
+import com.example.calpick.domain.entity.enums.NotificationStatus;
+import com.example.calpick.global.exception.CalPickException;
+import com.example.calpick.global.exception.ErrorCode;
+import com.example.calpick.repository.NotificationRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.Random;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class MailService {
+    private final JavaMailSender javaMailSender;
+    private final NotificationRepository notificationRepository;
+
+
+
+    private final TransactionTemplate transactionTemplate;
+
+    @Value("${spring.mail.username}")
+    private String senderEmail;
+
+    public MimeMessage createMail(String mail, String title,String content) throws MessagingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        message.setFrom(senderEmail);
+        message.setRecipients(MimeMessage.RecipientType.TO, mail);
+        message.setSubject(title); //메일 제목
+        String body = "";
+        body += "<h3>" + content+ "</h3>";
+        body += "<h3>감사합니다</h3>";
+        message.setText(body, "UTF-8", "html");
+
+        return message;
+    }
+
+    @Async("mailExecutor")
+    public void sendSimpleMessageAsync(String sendEmail,String title,Long notificationId,String content) throws Exception{
+
+        MimeMessage message = createMail(sendEmail, title, content); // 메일 생성
+        try {
+            javaMailSender.send(message); // 메일 발송
+            transactionTemplate.executeWithoutResult(status -> {
+                updateNotificationStatus(notificationId, NotificationStatus.SUCCESS);
+            });
+
+
+        } catch (Exception e) {
+            log.error("메일 발송 실패 - notificationId: {}",notificationId,e);
+            transactionTemplate.executeWithoutResult(status -> {
+                updateNotificationStatus(notificationId, NotificationStatus.SUCCESS);
+            });
+
+        }
+    }
+
+
+    public void updateNotificationStatus(Long notificationId, NotificationStatus status) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new CalPickException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        notification.setNotificationStatus(status);
+    }
+}
