@@ -1,5 +1,6 @@
 package com.example.calpick.service;
 
+import com.example.calpick.domain.dto.request.AppointmentRejectRequestDto;
 import com.example.calpick.domain.dto.request.AppointmentRequestDto;
 import com.example.calpick.domain.dto.response.AppointmentRequestDetailResponseDto;
 import com.example.calpick.domain.dto.response.AppointmentRequestListResponseDto;
@@ -128,10 +129,27 @@ public class AppointmentService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void acceptAppointmentRequest(Long id) throws Exception {
+    public void acceptAppointmentRequest(Long id,String content, String status) throws Exception {
+        if(status.equals("ACCEPT")){
+            acceptRequest(id);
+        }else if(status.equals("REJECT")){
+            rejectRequest(id,content);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void acceptRequest(Long id) throws Exception {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
         appointment.setAppointmentStatus(AppointmentStatus.ACCEPTED);
         appointment.setModifiedAt(LocalDateTime.now());
+
+        if(!scheduleRepository.findOverlappingSchedules(appointment.getStartAt(),appointment.getEndAt(),appointment.getReceiver().getUserId()).isEmpty()){
+            throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
+        }
+
+        if(appointment.getRequesterEmail().isEmpty() && !scheduleRepository.findOverlappingSchedules(appointment.getStartAt(),appointment.getEndAt(),appointment.getRequester().getUserId()).isEmpty()){ //요청자가 회원일때 요청자 일정도 확인
+            throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
+        }
 
         //수락자 회원 일정 추가
         Schedule receiverSchedule = Schedule.of(appointment,appointment.getReceiver());
@@ -165,10 +183,12 @@ public class AppointmentService {
         //요청자 알림 메일 발송
         mailService.sendSimpleMessageAsync(requesterEmail,"캘픽 약속 확정",notification.getNotificationId(),message);
 
+
     }
 
+
     @Transactional(rollbackFor = Exception.class)
-    public void rejectAppointmentRequest(Long id, String content) throws Exception {
+    public void rejectRequest(Long id, String content) throws Exception {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
 
         appointment.setAppointmentStatus(AppointmentStatus.REJECTED);
@@ -193,9 +213,5 @@ public class AppointmentService {
 
         //요청자 알림 메일 발송
         mailService.sendSimpleMessageAsync(requesterEmail,"캘픽 약속 거절",notification.getNotificationId(),message);
-
-
-
-
     }
 }

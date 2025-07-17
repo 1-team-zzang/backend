@@ -11,4 +11,6 @@ import lombok.Setter;
 @Setter
 public class AppointmentAcceptRequestDto {
     public Long id;
+    public String content;
+    public String status;
 }

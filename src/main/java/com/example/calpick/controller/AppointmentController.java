@@ -35,18 +35,10 @@ public class AppointmentController {
         return Response.success(appointmentService.getAppointmentRequest(appointmentId));
     }
 
-    @PutMapping("/requests/accept")
+    @PutMapping("/requests")
     public Response<Object> acceptAppointmentRequest(@RequestBody AppointmentAcceptRequestDto dto) throws Exception { //약속 수락
-        appointmentService.acceptAppointmentRequest(dto.id);
+        appointmentService.acceptAppointmentRequest(dto.id,dto.content,dto.status);
         return Response.success();
         
     }
-
-    @PutMapping("/requests/reject")
-    public Response<Object> rejectAppointmentRequest(@RequestBody AppointmentRejectRequestDto dto) throws Exception { //약속 거절
-        appointmentService.rejectAppointmentRequest(dto.id,dto.content);
-        return Response.success();
-    }
-
-
 }
