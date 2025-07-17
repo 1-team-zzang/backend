@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,4 +22,6 @@ public class AppointmentRequestDto {
     public String requesterEmail;  //비회원
     public Boolean isAllDay;
     public Long receiverId;
+
+
 }

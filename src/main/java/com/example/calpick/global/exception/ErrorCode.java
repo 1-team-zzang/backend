@@ -13,6 +13,8 @@ public enum ErrorCode {
     INVALID_TIME_RANGE(HttpStatus.BAD_REQUEST,"시작시간이 종료시간보다 빨라야 합니다","APT-01"),
     DUPLICATE_APPOINTMENT_TIME(HttpStatus.CONFLICT,"신청한 시간에 이미 일정이 존재합니다","APT-05"),
     APPOINTMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 약속 정보를 찾을 수 없습니다","APT-04"),
+    INVALID_APPOINTMENT_TIME(HttpStatus.BAD_REQUEST, "신청은 현재 시각 이후의 시간으로만 가능합니다", "APT-06"),
+
 
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 알림 정보를 찾을 수 없습니다","NOTI-01"),
 

@@ -34,24 +34,35 @@ public class MailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
-    public MimeMessage createMail(String mail, String title,String content) throws MessagingException {
+    public MimeMessage createMail(String sendEmail,String senderName,String title,String date, String url,String type) throws MessagingException {
+
+        MailMessageForm.MailMessage mail = null;
+
+        if(type.equals("REQUEST")){
+            mail = MailMessageForm.createRequestMessage(senderName,title,date,url);
+        }else if(type.equals("ACCEPT")){
+            mail = MailMessageForm.createConfirmMessage(senderName,title,date,url);
+        }else if(type.equals("REJECT")){
+            mail = MailMessageForm.createRejectMessage(senderName,title,date,url);
+        }
+
         MimeMessage message = javaMailSender.createMimeMessage();
 
+
         message.setFrom(senderEmail);
-        message.setRecipients(MimeMessage.RecipientType.TO, mail);
-        message.setSubject(title); //메일 제목
-        String body = "";
-        body += "<h3>" + content+ "</h3>";
-        body += "<h3>감사합니다</h3>";
+        message.setRecipients(MimeMessage.RecipientType.TO, sendEmail);
+        message.setSubject(mail.getTitle()); //메일 제목
+        String body = mail.getContent();
+
         message.setText(body, "UTF-8", "html");
 
         return message;
     }
 
     @Async("mailExecutor")
-    public void sendSimpleMessageAsync(String sendEmail,String title,Long notificationId,String content) throws Exception{
+    public void sendSimpleMessageAsync(String senderEmail,String senderName,String title,Long notificationId,String date, String url,String type) throws Exception{
 
-        MimeMessage message = createMail(sendEmail, title, content); // 메일 생성
+        MimeMessage message = createMail(senderEmail, senderName,title, date,url,type); // 메일 생성
         try {
             javaMailSender.send(message); // 메일 발송
             transactionTemplate.executeWithoutResult(status -> {

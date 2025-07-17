@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,10 @@ public class AppointmentService {
 
         if(!dto.getStartAt().isBefore(dto.getEndAt())){ //종료시간이 시작시간 보다 먼저일때,
             throw new CalPickException(ErrorCode.INVALID_TIME_RANGE);
+        }
+
+        if (dto.startAt.isBefore(LocalDateTime.now())) {
+            throw new CalPickException(ErrorCode.INVALID_APPOINTMENT_TIME);
         }
 
         if(!scheduleRepository.findOverlappingSchedules(dto.startAt,dto.endAt,dto.receiverId).isEmpty()){
@@ -82,9 +87,10 @@ public class AppointmentService {
         NotificationType notificationType = NotificationType.of(com.example.calpick.domain.entity.enums.NotificationType.APPOINTMENT,savedAppointment.getAppointmentId(),savedNotification);
         notificationTypeRepository.save(notificationType);
 
-        String message = dto.getRequesterName() + " 님이 약속을 신청하셨습니다. 약속 신청 목록을 확인해주세요.";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String date = dto.getStartAt().format(formatter) + " ~ " + dto.getEndAt().format(formatter);
 
-        mailService.sendSimpleMessageAsync(receiver.getEmail(),"캘픽 약속 신청",savedNotification.getNotificationId(),message);
+        mailService.sendSimpleMessageAsync(receiver.getEmail(),dto.requesterName, dto.getTitle(),savedNotification.getNotificationId(),date,"","REQUEST");
     }
 
     @Transactional
@@ -167,10 +173,13 @@ public class AppointmentService {
         NotificationType notificationType = NotificationType.of(com.example.calpick.domain.entity.enums.NotificationType.APPOINTMENT,appointment.getAppointmentId(),notification);
         notificationTypeRepository.save(notificationType);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
+
         String message = appointment.getTitle()+" 약속이 확정되었습니다.";
 
         //수신자 수락 알림 메일 발송
-        mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),"캘픽 약속 확정",notification.getNotificationId(),message);
+        mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","ACCEPT");
 
         String requesterEmail = "";
 
@@ -181,7 +190,7 @@ public class AppointmentService {
         }
 
         //요청자 알림 메일 발송
-        mailService.sendSimpleMessageAsync(requesterEmail,"캘픽 약속 확정",notification.getNotificationId(),message);
+        mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","ACCEPT");
 
 
     }
@@ -199,10 +208,6 @@ public class AppointmentService {
         NotificationType notificationType = NotificationType.of(com.example.calpick.domain.entity.enums.NotificationType.APPOINTMENT,appointment.getAppointmentId(),notification);
         notificationTypeRepository.save(notificationType);
 
-        //요청자에게 거절 메일 발송
-        String message = appointment.getReceiver().getName() + " 님으로부터 거절 메시지: "+ content;
-
-
         String requesterEmail = "";
 
         if(appointment.getRequester()!=null){
@@ -211,7 +216,10 @@ public class AppointmentService {
             requesterEmail = appointment.getRequesterEmail();
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
+
         //요청자 알림 메일 발송
-        mailService.sendSimpleMessageAsync(requesterEmail,"캘픽 약속 거절",notification.getNotificationId(),message);
+        mailService.sendSimpleMessageAsync(requesterEmail, appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","REJECT");
     }
 }
