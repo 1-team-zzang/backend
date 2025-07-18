@@ -9,12 +9,15 @@ import com.example.calpick.domain.repository.UserRepository;
 import com.example.calpick.domain.service.AuthService;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +28,16 @@ public class AuthServiceImpl implements AuthService {
     private final ModelMapper mapper;
 
     @Override
-    public String logout() {
-        return null;
+    public void logout(String email, HttpServletResponse response) {
+        ResponseCookie deleteCookie = ResponseCookie.from("Refresh-Token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0) // 삭제
+                .sameSite("None")
+                .build();
+
+        response.setHeader("Set-Cookie", deleteCookie.toString());
     }
 
     @Override
@@ -52,8 +63,25 @@ public class AuthServiceImpl implements AuthService {
         return mapper.map(newUser, SignupResponse.class);
     }
 
+
     @Override
-    public String withdraw() {
-        return null;
+    public void withdraw(String email, HttpServletResponse response) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CalPickException(ErrorCode.INVALID_EMAIL));
+
+        // SOFT DELETE
+        user.setDeletedAt(LocalDateTime.now());
+        user.setUserStatus(UserStatus.DELETED);
+        userRepository.save(user);
+
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
+
+        response.setHeader("Set-Cookie", deleteCookie.toString());
     }
 }
