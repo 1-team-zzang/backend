@@ -1,5 +1,6 @@
 package com.example.calpick.domain.dto.response.appointment;
 
+import com.example.calpick.domain.entity.enums.AppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class AppointmentRequestsDto {
     public LocalDateTime endAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime inviteAt;
+    public AppointmentStatus status;
 
 
 }

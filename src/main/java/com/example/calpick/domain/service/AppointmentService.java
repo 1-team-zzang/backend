@@ -4,13 +4,13 @@ import com.example.calpick.domain.dto.request.appointment.AppointmentRequestDto;
 import com.example.calpick.domain.dto.response.appointment.AppointmentRequestDetailResponseDto;
 import com.example.calpick.domain.dto.response.appointment.AppointmentRequestListResponseDto;
 import com.example.calpick.domain.dto.response.appointment.AppointmentRequestsDto;
+import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.entity.*;
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
 import com.example.calpick.domain.repository.*;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
-import com.example.calpick.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -39,9 +39,11 @@ public class AppointmentService {
 
     private final ModelMapper modelMapper;
     @Transactional(rollbackFor = Exception.class)
-    public void requestAppointments(AppointmentRequestDto dto) throws Exception {
-        Long userId = 2L;
-        User user = userRepository.findById(userId).get(); //회원일때
+    public void requestAppointments(CustomUserDetails userDetails, AppointmentRequestDto dto) throws Exception {
+        User user = null;
+        if(userDetails != null){ //회원
+            user = userRepository.findByEmail(userDetails.getEmail()).get();
+        }
         User receiver = userRepository.findById(dto.getReceiverId()).get();
 
         if(dto.getIsAllDay()){ //종일 일때
@@ -61,7 +63,7 @@ public class AppointmentService {
             throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
         }
 
-        if(dto.requesterEmail.isEmpty() && !scheduleRepository.findOverlappingSchedules(dto.startAt,dto.endAt,userId).isEmpty()){ //요청자가 회원일때 요청자 일정도 확인
+        if(dto.requesterEmail.isEmpty() && !scheduleRepository.findOverlappingSchedules(dto.startAt,dto.endAt,user.getUserId()).isEmpty()){ //요청자가 회원일때 요청자 일정도 확인
             throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
         }
 
@@ -94,9 +96,9 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentRequestListResponseDto getAppointmentRequestsList(int page, int size, String status){
-        Long userId = 1L;
+    public AppointmentRequestListResponseDto getAppointmentRequestsList(String email,int page, int size, String status){
         Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        User user = userRepository.findByEmail(email).get();
         List<AppointmentStatus> statusList;
 
         if(status.equals("REQUESTED")){ //대기 중 약속 목록
@@ -110,9 +112,10 @@ public class AppointmentService {
         modelMapper.typeMap(Appointment.class, AppointmentRequestsDto.class)
                 .addMapping(Appointment::getAppointmentId, AppointmentRequestsDto::setId)
                 .addMapping(Appointment::getCreatedAt, AppointmentRequestsDto::setInviteAt)
-                .addMapping(Appointment::getRequesterName, AppointmentRequestsDto::setRequesterName);
+                .addMapping(Appointment::getRequesterName, AppointmentRequestsDto::setRequesterName)
+                .addMapping(Appointment::getAppointmentStatus, AppointmentRequestsDto::setStatus);
 
-        Page<Appointment> appointments = appointmentRepository.findByReceiverIdAndStatuses(userId,statusList,pageable);
+        Page<Appointment> appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),statusList,pageable);
 
         List<AppointmentRequestsDto> dtoList = appointments
                 .getContent()
@@ -124,32 +127,43 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentRequestDetailResponseDto getAppointmentRequest(Long id){
+    public AppointmentRequestDetailResponseDto getAppointmentRequest(String email,Long id){
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
+        User user = userRepository.findByEmail(email).get();
+
+        if(appointment.getReceiver().getUserId() != user.getUserId()){
+            throw new CalPickException(ErrorCode.NO_ACCESS_TO_APPOINTMENT_REQUEST);
+        }
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
         modelMapper.typeMap(Appointment.class, AppointmentRequestDetailResponseDto.class)
                 .addMapping(Appointment::getAppointmentId, AppointmentRequestDetailResponseDto::setId)
                 .addMapping(Appointment::getCreatedAt, AppointmentRequestDetailResponseDto::setInviteAt)
-                .addMapping(Appointment::getRequesterName, AppointmentRequestDetailResponseDto::setRequesterName);
+                .addMapping(Appointment::getRequesterName, AppointmentRequestDetailResponseDto::setRequesterName)
+                .addMapping(Appointment::getAppointmentStatus,AppointmentRequestDetailResponseDto::setStatus);
         return modelMapper.map(appointment, AppointmentRequestDetailResponseDto.class);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void acceptAppointmentRequest(Long id,String content, String status) throws Exception {
+    public void acceptAppointmentRequest(String email,Long id,String content, String status) throws Exception {
+        User user = userRepository.findByEmail(email).get();
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
+        if(appointment.getReceiver().getUserId() != user.getUserId()){
+            throw new CalPickException(ErrorCode.NO_ACCESS_TO_APPOINTMENT_REQUEST);
+        }
         if(status.equals("ACCEPT")){
-            acceptRequest(id);
+            acceptRequest(appointment,user.getUserId(),id);
         }else if(status.equals("REJECT")){
-            rejectRequest(id,content);
+            rejectRequest(appointment,user.getUserId(),id,content);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void acceptRequest(Long id) throws Exception {
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
+    public void acceptRequest(Appointment appointment,Long userId,Long id) throws Exception {
+
         appointment.setAppointmentStatus(AppointmentStatus.ACCEPTED);
         appointment.setModifiedAt(LocalDateTime.now());
 
-        if(!scheduleRepository.findOverlappingSchedules(appointment.getStartAt(),appointment.getEndAt(),appointment.getReceiver().getUserId()).isEmpty()){
+        if(!scheduleRepository.findOverlappingSchedules(appointment.getStartAt(),appointment.getEndAt(),userId).isEmpty()){
             throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
         }
 
@@ -176,8 +190,6 @@ public class AppointmentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
-        String message = appointment.getTitle()+" 약속이 확정되었습니다.";
-
         //수신자 수락 알림 메일 발송
         mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","ACCEPT");
 
@@ -197,9 +209,7 @@ public class AppointmentService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void rejectRequest(Long id, String content) throws Exception {
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
-
+    public void rejectRequest(Appointment appointment,Long userId,Long id, String content) throws Exception {
         appointment.setAppointmentStatus(AppointmentStatus.REJECTED);
 
         Notification notification = Notification.of(appointment,NotificationEvent.REJECT,content);

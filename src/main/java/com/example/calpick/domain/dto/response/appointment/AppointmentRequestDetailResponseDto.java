@@ -1,5 +1,6 @@
 package com.example.calpick.domain.dto.response.appointment;
 
+import com.example.calpick.domain.entity.enums.AppointmentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,5 @@ public class AppointmentRequestDetailResponseDto {
 
     public String content;
 
-
-
+    public AppointmentStatus status;
 }

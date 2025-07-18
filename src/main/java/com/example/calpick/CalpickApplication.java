@@ -12,9 +12,4 @@ public class CalpickApplication {
 		SpringApplication.run(CalpickApplication.class, args);
 	}
 
-	@Bean
-	public ModelMapper modelMapper() {
-		return new ModelMapper();
-	}
-
 }

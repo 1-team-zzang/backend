@@ -73,8 +73,6 @@ public class MailService {
 
         }
     }
-
-
     public void updateNotificationStatus(Long notificationId, NotificationStatus status) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new CalPickException(ErrorCode.NOTIFICATION_NOT_FOUND));
