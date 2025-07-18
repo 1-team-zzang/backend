@@ -1,13 +1,13 @@
-package com.example.calpick.service;
+package com.example.calpick.domain.service;
 
-import com.example.calpick.domain.dto.request.AppointmentRejectRequestDto;
-import com.example.calpick.domain.dto.request.AppointmentRequestDto;
-import com.example.calpick.domain.dto.response.AppointmentRequestDetailResponseDto;
-import com.example.calpick.domain.dto.response.AppointmentRequestListResponseDto;
-import com.example.calpick.domain.dto.response.AppointmentRequestsDto;
+import com.example.calpick.domain.dto.request.appointment.AppointmentRequestDto;
+import com.example.calpick.domain.dto.response.appointment.AppointmentRequestDetailResponseDto;
+import com.example.calpick.domain.dto.response.appointment.AppointmentRequestListResponseDto;
+import com.example.calpick.domain.dto.response.appointment.AppointmentRequestsDto;
 import com.example.calpick.domain.entity.*;
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
+import com.example.calpick.domain.repository.*;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
 import com.example.calpick.repository.*;

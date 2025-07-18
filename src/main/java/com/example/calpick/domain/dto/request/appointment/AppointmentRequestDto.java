@@ -1,4 +1,4 @@
-package com.example.calpick.domain.dto.request;
+package com.example.calpick.domain.dto.request.appointment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

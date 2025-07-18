@@ -1,4 +1,4 @@
-package com.example.calpick.service;
+package com.example.calpick.domain.service;
 
 public class MailMessageForm {
     public static class MailMessage {

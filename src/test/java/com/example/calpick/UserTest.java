@@ -3,7 +3,7 @@ package com.example.calpick;
 import com.example.calpick.domain.entity.User;
 import com.example.calpick.domain.entity.enums.LoginType;
 import com.example.calpick.domain.entity.enums.UserStatus;
-import com.example.calpick.repository.UserRepository;
+import com.example.calpick.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

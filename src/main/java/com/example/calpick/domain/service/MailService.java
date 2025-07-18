@@ -1,24 +1,19 @@
-package com.example.calpick.service;
+package com.example.calpick.domain.service;
 
 import com.example.calpick.domain.entity.Notification;
 import com.example.calpick.domain.entity.enums.NotificationStatus;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
-import com.example.calpick.repository.NotificationRepository;
+import com.example.calpick.domain.repository.NotificationRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor

@@ -1,12 +1,11 @@
-package com.example.calpick.controller;
+package com.example.calpick.domain.controller;
 
-import com.example.calpick.domain.dto.request.AppointmentAcceptRequestDto;
-import com.example.calpick.domain.dto.request.AppointmentRejectRequestDto;
-import com.example.calpick.domain.dto.request.AppointmentRequestDto;
-import com.example.calpick.domain.dto.response.AppointmentRequestDetailResponseDto;
-import com.example.calpick.domain.dto.response.AppointmentRequestListResponseDto;
+import com.example.calpick.domain.dto.request.appointment.AppointmentAcceptRequestDto;
+import com.example.calpick.domain.dto.request.appointment.AppointmentRequestDto;
+import com.example.calpick.domain.dto.response.appointment.AppointmentRequestDetailResponseDto;
+import com.example.calpick.domain.dto.response.appointment.AppointmentRequestListResponseDto;
 import com.example.calpick.domain.dto.response.Response;
-import com.example.calpick.service.AppointmentService;
+import com.example.calpick.domain.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

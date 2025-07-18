@@ -1,4 +1,4 @@
-package com.example.calpick.repository;
+package com.example.calpick.domain.repository;
 
 import com.example.calpick.domain.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;

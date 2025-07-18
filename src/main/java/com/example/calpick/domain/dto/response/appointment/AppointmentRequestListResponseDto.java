@@ -1,4 +1,4 @@
-package com.example.calpick.domain.dto.response;
+package com.example.calpick.domain.dto.response.appointment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

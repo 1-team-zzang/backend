@@ -1,4 +1,4 @@
-package com.example.calpick.repository;
+package com.example.calpick.domain.repository;
 
 import com.example.calpick.domain.entity.Appointment;
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
