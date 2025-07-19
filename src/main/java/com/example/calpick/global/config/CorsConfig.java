@@ -14,8 +14,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-//                        .allowedOrigins("https://fe-domain.com") // 프론트 도메인
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("https://calpick.vercel.app/") // 프론트 도메인
+                        .allowedOrigins("http://localhost:5173")
                         .allowedMethods("*")
                         .allowCredentials(true) // 쿠키 허용
                         .allowedHeaders("*")
