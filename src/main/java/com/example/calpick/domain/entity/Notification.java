@@ -3,15 +3,21 @@ package com.example.calpick.domain.entity;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
 import com.example.calpick.domain.entity.enums.NotificationStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table
+@Getter
+@Setter
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long notificationId;
+
+    private String content;
 
     private String requesterName;
     private String requesterEmail;
@@ -30,4 +36,22 @@ public class Notification {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     private User receiver;
+
+    public static Notification of(Appointment appointment, NotificationEvent event,String content) {
+        Notification notification = new Notification();
+
+        if (appointment.getRequester() != null) {
+            notification.setRequester(appointment.getRequester());
+        } else {
+            notification.setRequesterEmail(appointment.getRequesterEmail());
+        }
+        notification.setContent(content);
+        notification.setRequesterName(appointment.getRequesterName());
+        notification.setReceiver(appointment.getReceiver());
+        notification.setEvent(event);
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setNotificationStatus(NotificationStatus.PENDING);
+
+        return notification;
+    }
 }
