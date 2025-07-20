@@ -31,12 +31,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
         // 헤더 검증
         if (authorization == null || !authorization.startsWith("Bearer ")){
-            logger.error("token null");
             filterChain.doFilter(request, response);
             return;
         }
 
-        logger.info("authorization starts");
         String accessToken = authorization.split(" ")[1];
 
         // 토큰 만료 검증
