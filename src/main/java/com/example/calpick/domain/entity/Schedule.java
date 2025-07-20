@@ -1,7 +1,8 @@
 package com.example.calpick.domain.entity;
 
 import com.example.calpick.domain.entity.enums.RepeatRule;
-import com.example.calpick.domain.entity.enums.Visibility;
+import com.example.calpick.domain.entity.enums.RepeatType;
+import com.example.calpick.domain.entity.enums.ColorTypes;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,11 +29,17 @@ public class Schedule {
     private Boolean isRepeated;
     @Enumerated(EnumType.STRING)
     private RepeatRule repeatRule;
-    @Enumerated(EnumType.STRING)
-    private Visibility visibility;
+    private Boolean isVisible;
+
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Boolean isAllDay;
+    @Enumerated(EnumType.STRING)
+    private RepeatType repeatType;
+    private Long repeatCount;
+    private LocalDateTime repeatEndAt;
+    @Enumerated(EnumType.STRING)
+    private ColorTypes color;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -49,10 +56,11 @@ public class Schedule {
         schedule.setEndAt(appointment.getEndAt());
         schedule.setCreatedAt(LocalDateTime.now());
         schedule.setIsRepeated(false);
-        schedule.setVisibility(Visibility.PUBLIC);
+        schedule.setIsVisible(true);
         schedule.setIsAllDay(appointment.getIsAllDay());
         schedule.setUser(user);
         schedule.setAppointment(appointment);
+        schedule.setColor(ColorTypes.RED);
         return schedule;
     }
 

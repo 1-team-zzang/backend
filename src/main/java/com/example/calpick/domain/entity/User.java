@@ -21,6 +21,7 @@ public class User {
     private String password;
     private String name;
     private String profileUrl;
+    private String shareToken;
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;

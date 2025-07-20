@@ -33,29 +33,20 @@ public class AppointmentController {
                                                                                   @RequestParam(name = "page", defaultValue = "1") int page,
                                                                                   @RequestParam(name = "size", defaultValue = "10") int size,
                                                                                   @RequestParam(name = "status") String status){ //약속 신청 목록 조회
-        if(userDetails == null){
-            throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
-        }
         return Response.success(appointmentService.getAppointmentRequestsList(userDetails.getEmail(),page,size,status));
     }
 
     @GetMapping("/requests/{appointmentId}")
     public Response<AppointmentRequestDetailResponseDto> getAppointmentRequests(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                 @PathVariable("appointmentId")Long appointmentId){ //약속 세부 내용 조회
-        if(userDetails == null){
-            throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
-        }
+
         return Response.success(appointmentService.getAppointmentRequest(userDetails.getEmail(),appointmentId));
     }
 
     @PutMapping("/requests")
     public Response<Object> acceptAppointmentRequest(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                      @RequestBody AppointmentAcceptRequestDto dto) throws Exception { //약속 수락
-        if(userDetails == null){
-            throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
-        }
         appointmentService.acceptAppointmentRequest(userDetails.getEmail(),dto.id,dto.content,dto.status);
         return Response.success();
-        
     }
 }
