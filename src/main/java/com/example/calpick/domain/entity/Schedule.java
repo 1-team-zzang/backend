@@ -29,13 +29,13 @@ public class Schedule {
     private Boolean isRepeated;
     @Enumerated(EnumType.STRING)
     private RepeatRule repeatRule;
-    private boolean isVisible;
+    private Boolean isVisible;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Boolean isAllDay;
     @Enumerated(EnumType.STRING)
     private RepeatType repeatType;
-    private long repeatCount;
+    private Long repeatCount;
     private LocalDateTime repeatEndAt;
     @Enumerated(EnumType.STRING)
     private ColorTypes color;
@@ -55,10 +55,11 @@ public class Schedule {
         schedule.setEndAt(appointment.getEndAt());
         schedule.setCreatedAt(LocalDateTime.now());
         schedule.setIsRepeated(false);
-        schedule.setVisible(true);
+        schedule.setIsVisible(true);
         schedule.setIsAllDay(appointment.getIsAllDay());
         schedule.setUser(user);
         schedule.setAppointment(appointment);
+        schedule.setColor(ColorTypes.RED);
         return schedule;
     }
 

@@ -59,13 +59,6 @@ public class AppointmentService {
             throw new CalPickException(ErrorCode.INVALID_APPOINTMENT_TIME);
         }
 
-        if(!scheduleRepository.findOverlappingSchedules(dto.startAt,dto.endAt,dto.receiverId).isEmpty()){
-            throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
-        }
-
-        if(dto.requesterEmail.isEmpty() && !scheduleRepository.findOverlappingSchedules(dto.startAt,dto.endAt,user.getUserId()).isEmpty()){ //요청자가 회원일때 요청자 일정도 확인
-            throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
-        }
 
         Appointment appointment = modelMapper.map(dto, Appointment.class);
         appointment.setRequester(null);
@@ -162,14 +155,6 @@ public class AppointmentService {
 
         appointment.setAppointmentStatus(AppointmentStatus.ACCEPTED);
         appointment.setModifiedAt(LocalDateTime.now());
-
-        if(!scheduleRepository.findOverlappingSchedules(appointment.getStartAt(),appointment.getEndAt(),userId).isEmpty()){
-            throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
-        }
-
-        if(appointment.getRequesterEmail().isEmpty() && !scheduleRepository.findOverlappingSchedules(appointment.getStartAt(),appointment.getEndAt(),appointment.getRequester().getUserId()).isEmpty()){ //요청자가 회원일때 요청자 일정도 확인
-            throw new CalPickException(ErrorCode.DUPLICATE_APPOINTMENT_TIME);
-        }
 
         //수락자 회원 일정 추가
         Schedule receiverSchedule = Schedule.of(appointment,appointment.getReceiver());
