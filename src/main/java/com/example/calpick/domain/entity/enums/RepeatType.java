@@ -1,5 +1,5 @@
 package com.example.calpick.domain.entity.enums;
 
-public enum Visibility {
-    PRIVATE, PUBLIC
+public enum RepeatType {
+    COUNT, DATE
 }

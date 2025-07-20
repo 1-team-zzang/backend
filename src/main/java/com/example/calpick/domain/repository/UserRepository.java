@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query(
-            value = " select user_id, email, password, name, profile_url, user_status, login_type, created_at, modified_at, deleted_at " +
+            value = " select user_id, email, password, name, profile_url, user_status, login_type, created_at, modified_at, deleted_at, share_token " +
                     " from users where email=:email",
             nativeQuery = true
     )
