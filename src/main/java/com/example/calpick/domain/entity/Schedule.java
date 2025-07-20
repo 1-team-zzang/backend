@@ -1,8 +1,8 @@
 package com.example.calpick.domain.entity;
 
+import com.example.calpick.domain.entity.enums.ColorTypes;
 import com.example.calpick.domain.entity.enums.RepeatRule;
 import com.example.calpick.domain.entity.enums.RepeatType;
-import com.example.calpick.domain.entity.enums.ColorTypes;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +30,6 @@ public class Schedule {
     @Enumerated(EnumType.STRING)
     private RepeatRule repeatRule;
     private Boolean isVisible;
-
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Boolean isAllDay;
