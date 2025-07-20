@@ -1,0 +1,143 @@
+package com.example.calpick.domain.repository;
+
+import com.example.calpick.domain.dto.response.friendRequest.FriendRequestDto;
+import com.example.calpick.domain.dto.response.friendRequest.FriendResponseDto;
+import com.example.calpick.domain.entity.FriendRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface FriendRequestRepository extends JpaRepository<FriendRequest,Long> {
+
+     @Query(value = """
+         SELECT * FROM (
+             SELECT fr.friend_request_id AS friendRequestId,
+                    u.user_id AS userId,
+                    u.name AS name,
+                    u.email AS email
+                    u.profile_url AS profileUrl
+             FROM friend_request fr
+             JOIN users u ON fr.receiver_id = u.user_id
+             WHERE fr.request_status = 'ACCEPTED'
+               AND fr.requester_id = :userId
+     
+             UNION ALL
+     
+             SELECT fr.friend_request_id AS friendRequestId,
+                    u.user_id AS userId,
+                    u.name AS name,
+                    u.email AS email
+                    u.profile_url As profileUrl
+             FROM friend_request fr
+             JOIN users u ON fr.requester_id = u.user_id
+             WHERE fr.request_status = 'ACCEPTED'
+               AND fr.receiver_id = :userId
+         ) AS friends
+         ORDER BY name,email ASC
+         """,  countQuery = """
+            SELECT 
+            (
+                 SELECT COUNT(*) FROM friend_request fr
+                 WHERE fr.request_status = 'ACCEPTED'
+                   AND fr.requester_id = :userId
+            ) + 
+            (
+               SELECT COUNT(*) FROM friend_request fr
+               WHERE fr.request_status = 'ACCEPTED'
+               AND fr.receiver_id = :userId  
+            ) 
+         """,
+             nativeQuery = true)
+     Page<FriendResponseDto> getFriendList(@Param("userId") Long userId, Pageable pageable); //친구 목록 조회
+
+
+     @Query(value = """
+         SELECT EXISTS (
+             SELECT 1
+             FROM friend_request fr
+             WHERE fr.requester_id = :userId
+               AND fr.receiver_id = :receiverId
+               AND fr.request_status = 'REQUESTED'
+         )
+     """, nativeQuery = true)
+     boolean isDuplicatedFriendRequest(@Param("userId") Long userId, @Param("receiverId") Long receiverId);
+
+     @Query(value = """
+         SELECT EXISTS (
+             SELECT 1
+             FROM friend_request fr
+             WHERE fr.requester_id = :receiverId
+               AND fr.receiver_id = :userId
+               AND fr.request_status = 'REQUESTED'
+         )
+     """, nativeQuery = true)
+     boolean isExistedFriendRequest(@Param("userId") Long userId, @Param("receiverId") Long receiverId);
+
+
+     @Query(value = """
+         SELECT EXISTS (
+             SELECT 1
+             FROM friend_request fr
+             WHERE fr.request_status = 'ACCEPTED'
+               AND (
+                 (fr.requester_id = :userId AND fr.receiver_id = :friendId)
+                 OR
+                 (fr.requester_id = :friendId AND fr.receiver_id = :userId)
+               )
+         )
+     """, nativeQuery = true)
+     boolean isAlreadyFriends(@Param("userId") Long userId, @Param("friendId") Long friendId);
+
+     @Query(value = """
+     SELECT fr.friend_request_id AS friendRequestId,
+            u.name AS name,
+            u.email AS email,
+            u.profile_url AS profileUrl
+            
+     FROM friend_request fr
+     JOIN users u ON u.user_id = fr.requester_id
+     WHERE fr.receiver_id = :userId AND fr.request_status = 'REQUESTED'
+
+     """, countQuery = """
+        SELECT COUNT(*)
+        FROM friend_request fr
+        WHERE fr.receiver_id = :userId AND fr.request_status = 'REQUESTED'
+        """,
+             nativeQuery = true)
+     Page<FriendRequestDto> getFriendRequestsList(@Param("userId") Long userId, Pageable pageable);
+
+     @Query(value = """
+        SELECT
+        u.user_id AS userId,
+        u.name AS name,
+        u.email AS email,
+        u.profile_url AS profileUrl,
+        CASE
+          WHEN fr.friend_request_id IS NOT NULL THEN true
+          ELSE false
+        END AS isFriend
+        FROM users u
+        LEFT JOIN friend_request fr
+        ON fr.request_status = 'ACCEPTED'
+        AND (
+          (fr.requester_id = :userId AND fr.receiver_id = u.user_id)
+          OR
+          (fr.requester_id = u.user_id AND fr.receiver_id = :userId)
+        )
+        WHERE (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
+        OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
+        ORDER BY u.name ASC, u.email ASC
+         """,
+             nativeQuery = true)
+     List<Object> searchUsersWithFriendStatus(
+             @Param("userId") Long userId,
+             @Param("searchType") String searchType,
+             @Param("query") String query
+     );
+
+
+}
