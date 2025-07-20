@@ -38,3 +38,4 @@ out/
 
 # 환경 파일
 .env
+src/main/resources/env.properties
