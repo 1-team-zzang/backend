@@ -1,5 +1,6 @@
 package com.example.calpick.domain.entity;
 
+import com.example.calpick.domain.dto.schedule.request.ScheduleRequestDto;
 import com.example.calpick.domain.entity.enums.ColorTypes;
 import com.example.calpick.domain.entity.enums.RepeatRule;
 import com.example.calpick.domain.entity.enums.RepeatType;
@@ -63,4 +64,18 @@ public class Schedule {
         return schedule;
     }
 
+    public static Schedule of(ScheduleRequestDto request, User user) {
+        Schedule schedule = new Schedule();
+        schedule.setTitle(request.getTitle());
+        schedule.setStartAt(request.getStartAt());
+        schedule.setEndAt(request.getEndAt());
+        schedule.setCreatedAt(LocalDateTime.now());
+        schedule.setIsRepeated(false);
+        schedule.setIsVisible(true);
+        schedule.setIsAllDay(request.getIsAllDay());
+        schedule.setUser(user);
+        schedule.setAppointment(null);
+        schedule.setColor(ColorTypes.RED);
+        return schedule;
+    }
 }
