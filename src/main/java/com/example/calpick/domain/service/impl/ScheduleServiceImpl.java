@@ -16,8 +16,6 @@ import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
