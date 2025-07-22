@@ -6,4 +6,5 @@ import com.example.calpick.domain.dto.user.CustomUserDetails;
 
 public interface ScheduleService {
     ScheduleResponseDto createSchedule(CustomUserDetails userDetails, ScheduleRequestDto request);
+    ScheduleResponseDto getSchedule(CustomUserDetails userDetails, Long scheduleId);
 }

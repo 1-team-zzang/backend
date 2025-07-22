@@ -7,9 +7,7 @@ import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/schedules")
@@ -18,8 +16,13 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @PostMapping
-    Response<ScheduleResponseDto> createSchedule(@AuthenticationPrincipal CustomUserDetails user, ScheduleRequestDto requestDto){
+    Response<ScheduleResponseDto> createSchedule(@AuthenticationPrincipal CustomUserDetails user, @RequestBody ScheduleRequestDto requestDto){
         return Response.success(scheduleService.createSchedule(user, requestDto));
     }
 
+    @GetMapping("/{scheduleId}")
+    Response<ScheduleResponseDto> getSchedule(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                              @PathVariable("scheduleId") Long scheduleId){
+        return Response.success(scheduleService.getSchedule(userDetails, scheduleId));
+    }
 }
