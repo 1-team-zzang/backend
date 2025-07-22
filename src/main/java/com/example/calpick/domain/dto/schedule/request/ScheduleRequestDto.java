@@ -24,12 +24,10 @@ public class ScheduleRequestDto {
     public Boolean isRepeated;
     public String repeatRule;
     public Boolean isVisible;
-    public LocalDateTime createdAt;
-    public LocalDateTime modifiedAt;
     public Boolean isAllDay;
     public String repeatType;
     public Long repeatCount;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime repeatEndAt;
     public String color;
-
 }

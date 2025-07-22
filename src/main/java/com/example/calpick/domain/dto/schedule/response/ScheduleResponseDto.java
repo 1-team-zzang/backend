@@ -1,5 +1,8 @@
 package com.example.calpick.domain.dto.schedule.response;
 
+import com.example.calpick.domain.entity.enums.ColorTypes;
+import com.example.calpick.domain.entity.enums.RepeatRule;
+import com.example.calpick.domain.entity.enums.RepeatType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,13 +26,14 @@ public class ScheduleResponseDto {
     public LocalDateTime endAt;
 
     public Boolean isRepeated;
-    public String repeatRule;
+    public RepeatRule repeatRule;
     public Boolean isVisible;
     public LocalDateTime createdAt;
     public LocalDateTime modifiedAt;
     public Boolean isAllDay;
-    public String repeatType;
+    public RepeatType repeatType;
     public Long repeatCount;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime repeatEndAt;
-    public String color;
+    public ColorTypes color;
 }

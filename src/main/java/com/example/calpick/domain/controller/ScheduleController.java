@@ -25,4 +25,11 @@ public class ScheduleController {
                                               @PathVariable("scheduleId") Long scheduleId){
         return Response.success(scheduleService.getSchedule(userDetails, scheduleId));
     }
+
+    @PutMapping("/{scheduleId}")
+    Response<ScheduleResponseDto> editSchedule(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                               @PathVariable("scheduleId") Long scheduleId,
+                                               @RequestBody ScheduleRequestDto requestDto){
+        return Response.success(scheduleService.updateSchedule(userDetails, scheduleId, requestDto));
+    }
 }

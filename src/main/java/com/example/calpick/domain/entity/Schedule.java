@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import static com.example.calpick.domain.util.EnumUtil.fromString;
 import java.time.LocalDateTime;
 
 @Entity
@@ -67,15 +67,21 @@ public class Schedule {
     public static Schedule of(ScheduleRequestDto request, User user) {
         Schedule schedule = new Schedule();
         schedule.setTitle(request.getTitle());
+        schedule.setContent(request.getContent());
         schedule.setStartAt(request.getStartAt());
         schedule.setEndAt(request.getEndAt());
         schedule.setCreatedAt(LocalDateTime.now());
+        schedule.setRepeatRule(fromString(RepeatRule.class, request.getRepeatRule()));
+        schedule.setRepeatType(fromString(RepeatType.class, request.getRepeatType()));
         schedule.setIsRepeated(false);
         schedule.setIsVisible(true);
         schedule.setIsAllDay(request.getIsAllDay());
         schedule.setUser(user);
         schedule.setAppointment(null);
-        schedule.setColor(ColorTypes.RED);
+        schedule.setRepeatCount(request.getRepeatCount());
+        schedule.setRepeatEndAt(request.getRepeatEndAt());
+        schedule.setColor(fromString(ColorTypes.class, request.getColor()));
+        schedule.setModifiedAt(LocalDateTime.now());
         return schedule;
     }
 }
