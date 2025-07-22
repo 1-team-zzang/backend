@@ -37,13 +37,10 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDto getSchedule(CustomUserDetails userDetails, Long scheduleId) {
-        // isVisible 따라 조회 범위 다름
         if( scheduleId == null ){
             throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
         }
         Schedule schedule = scheduleRepository.findScheduleByScheduleId(scheduleId).orElseThrow(() -> new CalPickException(ErrorCode.SCHEDULE_NOT_FOUND));
-        // isVisible = false고 작성자가 아닌 경우 조회 불가
-        if (!schedule.getIsVisible() && !userDetails.getEmail().equals(schedule.getUser().getEmail())) throw new CalPickException(ErrorCode.NO_ACCESS_TO_SCHEDULE);
         return mapper.map(schedule,ScheduleResponseDto.class);
     }
 
