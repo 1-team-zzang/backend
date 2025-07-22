@@ -73,8 +73,8 @@ public class Schedule {
         schedule.setCreatedAt(LocalDateTime.now());
         schedule.setRepeatRule(fromString(RepeatRule.class, request.getRepeatRule()));
         schedule.setRepeatType(fromString(RepeatType.class, request.getRepeatType()));
-        schedule.setIsRepeated(false);
-        schedule.setIsVisible(true);
+        schedule.setIsRepeated(request.getIsRepeated());
+        schedule.setIsVisible(request.getIsVisible());
         schedule.setIsAllDay(request.getIsAllDay());
         schedule.setUser(user);
         schedule.setAppointment(null);
