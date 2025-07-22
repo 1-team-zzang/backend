@@ -32,4 +32,11 @@ public class ScheduleController {
                                                @RequestBody ScheduleRequestDto requestDto){
         return Response.success(scheduleService.updateSchedule(userDetails, scheduleId, requestDto));
     }
+
+    @DeleteMapping("/{scheduleId}")
+    Response<Object> deleteSchedule(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                    @PathVariable("scheduleId") Long scheduleId){
+        scheduleService.deleteSchedule(userDetails, scheduleId);
+        return Response.success();
+    }
 }

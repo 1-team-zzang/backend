@@ -66,4 +66,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedule.setColor(fromString(ColorTypes.class, request.getColor()));
         return mapper.map(schedule, ScheduleResponseDto.class);
     }
+
+    @Override
+    public void deleteSchedule(CustomUserDetails userDetails, Long scheduleId) {
+        if( scheduleId == null ) throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
+        Schedule schedule = scheduleRepository.findScheduleByScheduleId(scheduleId).orElseThrow(() -> new CalPickException(ErrorCode.SCHEDULE_NOT_FOUND));
+        // 작성자만 삭제 가능
+        if (!userDetails.getEmail().equals(schedule.getUser().getEmail())) throw new CalPickException(ErrorCode.NO_ACCESS_TO_SCHEDULE);
+        scheduleRepository.delete(schedule);
+    }
 }
