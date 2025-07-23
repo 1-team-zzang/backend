@@ -54,4 +54,18 @@ public class Notification {
 
         return notification;
     }
+
+    public static Notification ofFriendRequest(User user,User friend, NotificationEvent event,String content) {
+        Notification notification = new Notification();
+
+        notification.setRequester(user);
+        notification.setContent(content);
+        notification.setRequesterName(user.getName());
+        notification.setReceiver(friend);
+        notification.setEvent(event);
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setNotificationStatus(NotificationStatus.PENDING);
+
+        return notification;
+    }
 }

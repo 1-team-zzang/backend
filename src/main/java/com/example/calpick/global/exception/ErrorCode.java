@@ -34,10 +34,21 @@ public enum ErrorCode {
 
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "인증이 필요합니다. 로그인 후 다시 시도해주세요.", "AUTH-06"),
 
+    //친구
+    NO_ACCESS_TO_FRIEND_REQUEST(HttpStatus.FORBIDDEN,"해당 친구 요청에 대한 권한이 없습니다.","FRD_01"),
+    FRIEND_NOT_FOUND(HttpStatus.NOT_FOUND,"요청한 친구 정보를 찾을 수 없습니다.","FRD_02"),
+    ALREADY_FRIENDS(HttpStatus.CONFLICT,"선택하신 사용자와는 이미 친구 상태입니다.","FRD_03"),
+    FRIEND_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND,"친구 요청 정보를 찾을 수 없습니다.","FRD_04"),
+    DUPLICATE_FRIEND_REQUEST(HttpStatus.CONFLICT,"이미 선택하신 사용자에게 친구 요청을 한 상태입니다.","FRD_05"),
+    FRIEND_REQUEST_ALREADY_RECEIVED(HttpStatus.CONFLICT,"선택한 사용자가 친구 요청을 한 상태입니다.","FRD_06"),
+
+
+
 
 
 
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error", "COMMON-500");
+
 
     private final HttpStatus status;
     private final String message;
