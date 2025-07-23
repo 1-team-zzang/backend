@@ -16,6 +16,11 @@ public enum ErrorCode {
     INVALID_APPOINTMENT_TIME(HttpStatus.BAD_REQUEST, "신청은 현재 시각 이후의 시간으로만 가능합니다", "APT-06"),
     NO_ACCESS_TO_APPOINTMENT_REQUEST(HttpStatus.FORBIDDEN, "해당 약속 신청에 대한 권한이 없습니다.", "APT-07"),
 
+    // SCHEDULE
+    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다.", "SCH-01"),
+    NO_ACCESS_TO_SCHEDULE(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다.", "SCH-02"),
+    INVALID_SCHEDULE_INPUT(HttpStatus.BAD_REQUEST, "필수 입력값이 미충족되었습니다.", "SCH-03"),
+    INVALID_SCHEDULE_TIME_RANGE(HttpStatus.NOT_FOUND, "시작시간이 종료시간보다 늦을 수 없습니다.", "SCH-04"),
 
 
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 알림 정보를 찾을 수 없습니다","NOTI-01"),
@@ -24,7 +29,7 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "중복된 이메일입니다.", "AUTH-01"),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "이메일 형식이 아닙니다.", "AUTH-02"),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "올바른 형식의 비밀번호가 아닙니다.","AUTH-03"),
-    INVALID_INPUT(HttpStatus.BAD_REQUEST, "필수 입력값이 미충족되었습니다.", "AUTH-04"),
+    INVALID_AUTH_INPUT(HttpStatus.BAD_REQUEST, "필수 입력값이 미충족되었습니다.", "AUTH-04"),
     INVALID_JWT_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 만료되었습니다. 다시 로그인해주세요.", "AUTH-05"),
 
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "인증이 필요합니다. 로그인 후 다시 시도해주세요.", "AUTH-06"),
