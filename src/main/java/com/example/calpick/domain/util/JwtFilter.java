@@ -81,6 +81,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 모든 검증 통과 시 새 accessToken 발급
         return jwtUtil.createAccessToken(
+                jwtUtil.getUserId(expiredAccessToken),
                 refreshEmail,
                 jwtUtil.getName(refreshToken)
         );

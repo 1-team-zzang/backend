@@ -31,6 +31,10 @@ public class JwtUtil {
         this.refreshTokenExpireMs = refreshTokenExpireMs;
     }
 
+    public Long getUserId(String token){
+        return Long.parseLong(parseClaims(token).getSubject());
+    }
+
     public String getName(String token){
         return parseClaims(token).get("name", String.class);
     }
@@ -49,9 +53,10 @@ public class JwtUtil {
         }catch (ExpiredJwtException e){ return e.getClaims(); }
     }
 
-    public String createAccessToken(String email, String name){
+    public String createAccessToken(Long userId, String email, String name){
         long nowMs = System.currentTimeMillis();
         return Jwts.builder()
+                .setSubject(userId.toString())
                 .claim("email", email)
                 .claim("name", name)
                 .setIssuedAt(new Date(nowMs))
