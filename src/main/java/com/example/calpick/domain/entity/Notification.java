@@ -55,7 +55,7 @@ public class Notification {
         return notification;
     }
 
-    public static Notification ofFriendRequest(User user,User friend, NotificationEvent event,String content) {
+    public static Notification of(User user,User friend, NotificationEvent event,String content) {
         Notification notification = new Notification();
 
         notification.setRequester(user);

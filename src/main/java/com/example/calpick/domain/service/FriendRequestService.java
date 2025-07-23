@@ -64,7 +64,7 @@ public class FriendRequestService {
         FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequest);
 
         //수신자에게 친구 신청 알람 메일 전송
-        Notification notification = Notification.ofFriendRequest(user, friend, NotificationEvent.REQUEST,"친구 요청입니다");
+        Notification notification = Notification.of(user, friend, NotificationEvent.REQUEST,"친구 요청입니다");
         Notification savedNotification = notificationRepository.save(notification);
 
 
@@ -101,7 +101,7 @@ public class FriendRequestService {
 
         friendRequest.setRequestStatus(RequestStatus.ACCEPTED);
 
-        Notification notification = Notification.ofFriendRequest(requester,receiver,NotificationEvent.ACCEPT,"친구가 추가되었습니다");
+        Notification notification = Notification.of(requester,receiver,NotificationEvent.ACCEPT,"친구가 추가되었습니다");
         notificationRepository.save(notification);
 
 
@@ -124,7 +124,7 @@ public class FriendRequestService {
     public void rejectRequest(FriendRequest friendRequest,User receiver, User requester) throws Exception {
         friendRequestRepository.delete(friendRequest);
 
-        Notification notification = Notification.ofFriendRequest(requester,receiver,NotificationEvent.REJECT,"친구 요청이 거절되었습니다");
+        Notification notification = Notification.of(requester,receiver,NotificationEvent.REJECT,"친구 요청이 거절되었습니다");
         notificationRepository.save(notification);
 
         NotificationType notificationType = NotificationType.of(com.example.calpick.domain.entity.enums.NotificationType.FRIEND,friendRequest.getFriendRequestId(),notification);
