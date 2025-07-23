@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import static com.example.calpick.domain.util.EnumUtil.fromString;
@@ -36,7 +37,13 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     public ScheduleResponseDto createSchedule(CustomUserDetails userDetails, ScheduleRequestDto request) {
         User user= userRepository.findByEmail(userDetails.getEmail()).orElseThrow(() -> new CalPickException(ErrorCode.INVALID_EMAIL));
-        Schedule newSchedule = scheduleRepository.save(Schedule.of(request, user));
+        Schedule schedule = Schedule.of(request, user);
+        if (schedule.getIsRepeated()) {
+            if (schedule.getRepeatType() == RepeatType.COUNT)
+                schedule.setRepeatEndAt(calculateRepeatEndAt(schedule.getRepeatRule(), schedule.getEndAt(), schedule.getRepeatCount()));
+            else schedule.setRepeatCount(calculateRepeatCount(schedule.getRepeatRule(), schedule.getEndAt(), schedule.getRepeatEndAt()));
+        }
+        Schedule newSchedule = scheduleRepository.save(schedule);
         return mapper.map(newSchedule, ScheduleResponseDto.class);
     }
 
@@ -49,7 +56,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return mapper.map(schedule,ScheduleResponseDto.class);
     }
 
-    public List<ScheduleResponseDto> getScheduleList(Long userId, LocalDate startDate, LocalDate endDate) {
+    private List<ScheduleResponseDto> getScheduleList(Long userId, LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atTime(0, 0);
         LocalDateTime endDateTime = endDate.atTime(23, 59);
         List<Schedule> scheduleList = scheduleRepository.getSchedulesByDateRange(
@@ -144,6 +151,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedule.setRepeatCount(request.getRepeatCount());
         schedule.setRepeatEndAt(request.getRepeatEndAt());
         schedule.setColor(fromString(ColorTypes.class, request.getColor()));
+
+        if (schedule.getIsRepeated()) {
+            if (schedule.getRepeatType() == RepeatType.COUNT)
+                schedule.setRepeatEndAt(calculateRepeatEndAt(schedule.getRepeatRule(), schedule.getEndAt(), schedule.getRepeatCount()));
+            else schedule.setRepeatCount(calculateRepeatCount(schedule.getRepeatRule(), schedule.getEndAt(), schedule.getRepeatEndAt()));
+        }
+
         return mapper.map(schedule, ScheduleResponseDto.class);
     }
 
@@ -162,5 +176,30 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (userDetails.getEmail() == null) throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
         User user = userRepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CalPickException(ErrorCode.INVALID_EMAIL));
         return new ScheduleShareDto(user.getUserId());
+    }
+
+    // 반복 계산
+    private LocalDateTime calculateRepeatEndAt(RepeatRule repeatRule,LocalDateTime endAt, Long repeatCount){
+        Long cnt = repeatCount-1;
+        LocalDateTime repeatEndAt = switch (repeatRule) {
+            case DAILY -> endAt.plusDays(cnt);
+            case WEEKLY -> endAt.plusWeeks(cnt);
+            case MONTHLY -> endAt.plusMonths(cnt);
+            case YEARLY -> endAt.plusYears(cnt);
+            default -> throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
+        };
+        return repeatEndAt;
+    }
+    private Long calculateRepeatCount(RepeatRule repeatRule, LocalDateTime endAt, LocalDateTime repeatEndAt){
+        Long count =  switch (repeatRule) {
+            case DAILY -> ChronoUnit.DAYS.between(endAt.toLocalDate(), repeatEndAt.toLocalDate())+1;
+            case WEEKLY -> ChronoUnit.WEEKS.between(endAt.toLocalDate(), repeatEndAt.toLocalDate())+1;
+            case MONTHLY -> ChronoUnit.MONTHS.between(endAt.toLocalDate().withDayOfMonth(1),
+                    repeatEndAt.toLocalDate().withDayOfMonth(1)) + 1;
+            case YEARLY -> ChronoUnit.YEARS.between(endAt.toLocalDate().withDayOfYear(1),
+                    repeatEndAt.toLocalDate().withDayOfYear(1)) + 1;
+            default -> throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
+        };
+        return count;
     }
 }

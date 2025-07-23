@@ -4,8 +4,6 @@ import com.example.calpick.domain.dto.schedule.request.ScheduleRequestDto;
 import com.example.calpick.domain.entity.enums.ColorTypes;
 import com.example.calpick.domain.entity.enums.RepeatRule;
 import com.example.calpick.domain.entity.enums.RepeatType;
-import com.example.calpick.global.exception.CalPickException;
-import com.example.calpick.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import static com.example.calpick.domain.util.EnumUtil.fromString;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table
@@ -85,31 +82,6 @@ public class Schedule {
         schedule.setRepeatEndAt(request.getRepeatEndAt());
         schedule.setColor(fromString(ColorTypes.class, request.getColor()));
         schedule.setModifiedAt(LocalDateTime.now());
-
-        if (schedule.getIsRepeated()){
-            if (schedule.getRepeatType()==RepeatType.COUNT){
-                Long cnt = request.getRepeatCount()-1;
-                LocalDateTime repeatEndAt = switch (schedule.getRepeatRule()) {
-                    case DAILY -> request.getEndAt().plusDays(cnt);
-                    case WEEKLY -> request.getEndAt().plusWeeks(cnt);
-                    case MONTHLY -> request.getEndAt().plusMonths(cnt);
-                    case YEARLY -> request.getEndAt().plusYears(cnt);
-                    default -> throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
-                };
-                schedule.setRepeatEndAt(repeatEndAt);
-            }else{
-                long count =  switch (schedule.getRepeatRule()) {
-                    case DAILY -> ChronoUnit.DAYS.between(request.getEndAt().toLocalDate(), request.getRepeatEndAt().toLocalDate())+1;
-                    case WEEKLY -> ChronoUnit.WEEKS.between(request.getEndAt().toLocalDate(), request.getRepeatEndAt().toLocalDate())+1;
-                    case MONTHLY -> ChronoUnit.MONTHS.between(request.getEndAt().toLocalDate().withDayOfMonth(1),
-                            request.getRepeatEndAt().toLocalDate().withDayOfMonth(1)) + 1;
-                    case YEARLY -> ChronoUnit.YEARS.between(request.getEndAt().toLocalDate().withDayOfYear(1),
-                                request.getRepeatEndAt().toLocalDate().withDayOfYear(1)) + 1;
-                    default -> throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
-                };
-                schedule.setRepeatCount(count);
-            }
-        }
         return schedule;
     }
 }
