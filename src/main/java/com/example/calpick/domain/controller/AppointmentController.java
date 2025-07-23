@@ -23,7 +23,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/requests")
-    public Response<Object> requestAppointment(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AppointmentRequestDto dto) throws Exception { //약속 신청
+    public Response<Object> requestAppointment(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AppointmentRequestDto dto) throws Exception {
         appointmentService.requestAppointments(userDetails,dto);
         return Response.success();
     }
@@ -32,20 +32,20 @@ public class AppointmentController {
     public Response<AppointmentRequestListResponseDto> getAppointmentRequestsList(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                   @RequestParam(name = "page", defaultValue = "1") int page,
                                                                                   @RequestParam(name = "size", defaultValue = "10") int size,
-                                                                                  @RequestParam(name = "status") String status){ //약속 신청 목록 조회
+                                                                                  @RequestParam(name = "status") String status){
         return Response.success(appointmentService.getAppointmentRequestsList(userDetails.getEmail(),page,size,status));
     }
 
     @GetMapping("/requests/{appointmentId}")
     public Response<AppointmentRequestDetailResponseDto> getAppointmentRequests(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                                @PathVariable("appointmentId")Long appointmentId){ //약속 세부 내용 조회
+                                                                                @PathVariable("appointmentId")Long appointmentId){
 
         return Response.success(appointmentService.getAppointmentRequest(userDetails.getEmail(),appointmentId));
     }
 
     @PutMapping("/requests")
     public Response<Object> acceptAppointmentRequest(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                     @RequestBody AppointmentAcceptRequestDto dto) throws Exception { //약속 수락
+                                                     @RequestBody AppointmentAcceptRequestDto dto) throws Exception {
         appointmentService.acceptAppointmentRequest(userDetails.getEmail(),dto.id,dto.content,dto.status);
         return Response.success();
     }
