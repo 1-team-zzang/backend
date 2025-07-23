@@ -4,8 +4,10 @@ import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.schedule.request.ScheduleRequestDto;
 import com.example.calpick.domain.dto.schedule.response.CalenderResponseDto;
 import com.example.calpick.domain.dto.schedule.response.ScheduleResponseDto;
+import com.example.calpick.domain.dto.schedule.response.ScheduleShareDto;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.service.ScheduleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
+@Tag(name = "Schedule", description = "Schedule API")
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
@@ -53,5 +56,10 @@ public class ScheduleController {
                                     @PathVariable("scheduleId") Long scheduleId){
         scheduleService.deleteSchedule(userDetails, scheduleId);
         return Response.success();
+    }
+
+    @GetMapping("/share")
+    Response<ScheduleShareDto> shareCalendar(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return Response.success(scheduleService.shareMyCalendar(userDetails));
     }
 }

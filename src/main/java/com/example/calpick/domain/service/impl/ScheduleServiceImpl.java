@@ -3,6 +3,7 @@ package com.example.calpick.domain.service.impl;
 import com.example.calpick.domain.dto.schedule.request.ScheduleRequestDto;
 import com.example.calpick.domain.dto.schedule.response.CalenderResponseDto;
 import com.example.calpick.domain.dto.schedule.response.ScheduleResponseDto;
+import com.example.calpick.domain.dto.schedule.response.ScheduleShareDto;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.entity.Schedule;
 import com.example.calpick.domain.entity.User;
@@ -154,5 +155,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         // 작성자만 삭제 가능
         if (!userDetails.getEmail().equals(schedule.getUser().getEmail())) throw new CalPickException(ErrorCode.NO_ACCESS_TO_SCHEDULE);
         scheduleRepository.delete(schedule);
+    }
+
+    @Override
+    public ScheduleShareDto shareMyCalendar(CustomUserDetails userDetails) {
+        if (userDetails.getEmail() == null) throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
+        User user = userRepository.findByEmail(userDetails.getEmail()).orElseThrow(()->new CalPickException(ErrorCode.INVALID_EMAIL));
+        return new ScheduleShareDto(user.getUserId());
     }
 }
