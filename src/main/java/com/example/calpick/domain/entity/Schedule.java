@@ -60,7 +60,7 @@ public class Schedule {
         schedule.setIsAllDay(appointment.getIsAllDay());
         schedule.setUser(user);
         schedule.setAppointment(appointment);
-        schedule.setColor(ColorTypes.RED);
+        schedule.setColor(appointment.getColor());
         return schedule;
     }
 

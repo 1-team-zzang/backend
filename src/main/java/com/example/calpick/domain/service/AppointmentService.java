@@ -7,6 +7,7 @@ import com.example.calpick.domain.dto.response.appointment.AppointmentRequestsDt
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.entity.*;
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
+import com.example.calpick.domain.entity.enums.ColorTypes;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
 import com.example.calpick.domain.repository.*;
 import com.example.calpick.global.exception.CalPickException;
@@ -25,6 +26,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.calpick.domain.util.EnumUtil.fromString;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +67,7 @@ public class AppointmentService {
         appointment.setRequester(null);
         appointment.setAppointmentId(null);
         appointment.setAppointmentStatus(AppointmentStatus.REQUESTED);
+        appointment.setColor(fromString(ColorTypes.class, dto.getColor()));
         if(dto.requesterEmail.isEmpty()){ //요청자가 회원일경우
             appointment.setRequester(user);
             appointment.setRequesterName(user.getName());

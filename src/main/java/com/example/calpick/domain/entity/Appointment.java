@@ -1,6 +1,7 @@
 package com.example.calpick.domain.entity;
 
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
+import com.example.calpick.domain.entity.enums.ColorTypes;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,5 +40,7 @@ public class Appointment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     private User receiver;
+    @Enumerated(EnumType.STRING)
+    private ColorTypes color;
 
 }

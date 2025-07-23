@@ -14,4 +14,10 @@ public class UserDto {
     private String email;
     private String name;
     private String profileUrl;
+
+    public UserDto(Long userId, String name, String email){
+        this.userId=userId;
+        this.name=name;
+        this.email=email;
+    }
 }
