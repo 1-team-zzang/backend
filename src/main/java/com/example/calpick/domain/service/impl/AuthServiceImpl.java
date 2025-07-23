@@ -15,9 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public SignupResponse signUp(SignupRequest dto) {
         String email = dto.getEmail();
         if (userRepository.existsByEmail(email)==1){
@@ -65,6 +66,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
+    @Transactional
     public void withdraw(String email, HttpServletResponse response) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CalPickException(ErrorCode.INVALID_EMAIL));
