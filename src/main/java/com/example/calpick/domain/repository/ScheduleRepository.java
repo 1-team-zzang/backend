@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
@@ -16,4 +17,20 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
     List<Schedule> findOverlappingSchedules(@Param("startAt") LocalDateTime startAt,
                                             @Param("endAt") LocalDateTime endAt,
                                             @Param("userId") Long userId);
+
+    Optional<Schedule> findScheduleByScheduleId(Long scheduleId);
+
+    @Query("""
+            SELECT s FROM Schedule s 
+            WHERE s.user.userId = :userId 
+            AND (
+                (s.isRepeated = false AND s.startAt <= :endDate AND s.endAt >= :startDate)
+                OR
+                (s.isRepeated = true AND s.startAt <= :endDate AND s.repeatEndAt >= :startDate)
+            )
+            """)
+    List<Schedule> getSchedulesByDateRange(@Param("userId") Long userId,
+                                           @Param("startDate") LocalDateTime startDate,
+                                           @Param("endDate") LocalDateTime endDate);
+
 }
