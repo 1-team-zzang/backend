@@ -3,6 +3,7 @@ package com.example.calpick.domain.controller;
 import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.dto.user.UserDto;
+import com.example.calpick.domain.dto.user.UserPasswordRequestDto;
 import com.example.calpick.domain.dto.user.UserProfileRequestDto;
 import com.example.calpick.domain.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,5 +27,12 @@ public class UserController {
     public Response<UserDto> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          @RequestBody UserProfileRequestDto request){
         return Response.success(userService.editProfile(userDetails, request));
+    }
+
+    @PutMapping("/password")
+    public Response<Object> editPassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestBody UserPasswordRequestDto request){
+        userService.editPassword(userDetails, request);
+        return Response.success();
     }
 }
