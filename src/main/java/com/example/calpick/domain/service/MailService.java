@@ -33,12 +33,18 @@ public class MailService {
 
         MailMessageForm.MailMessage mail = null;
 
-        if(type.equals("REQUEST")){
-            mail = MailMessageForm.createRequestMessage(senderName,title,date,url);
-        }else if(type.equals("ACCEPT")){
-            mail = MailMessageForm.createConfirmMessage(senderName,title,date,url);
-        }else if(type.equals("REJECT")){
-            mail = MailMessageForm.createRejectMessage(senderName,title,date,url);
+        if(type.equals("requestAppointment")){
+            mail = MailMessageForm.createAppointmentRequestMessage(senderName,title,date,url);
+        }else if(type.equals("acceptAppointment")){
+            mail = MailMessageForm.createAppointmentConfirmMessage(senderName,title,date,url);
+        }else if(type.equals("rejectAppointment")){
+            mail = MailMessageForm.createAppointmentRejectMessage(senderName,title,date,url);
+        }else if(type.equals("requestFriend")){
+            mail = MailMessageForm.createFriendRequestMessage(senderName,url);
+        }else if(type.equals("acceptFriend")){
+            mail = MailMessageForm.createFriendConfirmMessage(senderName,url);
+        }else if(type.equals("rejectFriend")){
+            mail = MailMessageForm.createFriendRejectMessage(senderName,url);
         }
 
         MimeMessage message = javaMailSender.createMimeMessage();

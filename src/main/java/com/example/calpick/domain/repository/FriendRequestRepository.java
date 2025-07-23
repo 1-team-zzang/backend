@@ -2,6 +2,8 @@ package com.example.calpick.domain.repository;
 
 import com.example.calpick.domain.dto.response.friendRequest.FriendRequestDto;
 import com.example.calpick.domain.dto.response.friendRequest.FriendResponseDto;
+import com.example.calpick.domain.dto.response.friendRequest.UserWithFriendStatusDto;
+import com.example.calpick.domain.dto.response.friendRequest.UserWithFriendStatusProjection;
 import com.example.calpick.domain.entity.FriendRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +20,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
              SELECT fr.friend_request_id AS friendRequestId,
                     u.user_id AS userId,
                     u.name AS name,
-                    u.email AS email
+                    u.email AS email,
                     u.profile_url AS profileUrl
              FROM friend_request fr
              JOIN users u ON fr.receiver_id = u.user_id
@@ -30,7 +32,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
              SELECT fr.friend_request_id AS friendRequestId,
                     u.user_id AS userId,
                     u.name AS name,
-                    u.email AS email
+                    u.email AS email,
                     u.profile_url As profileUrl
              FROM friend_request fr
              JOIN users u ON fr.requester_id = u.user_id
@@ -64,7 +66,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
                AND fr.request_status = 'REQUESTED'
          )
      """, nativeQuery = true)
-     boolean isDuplicatedFriendRequest(@Param("userId") Long userId, @Param("receiverId") Long receiverId);
+     Integer isDuplicatedFriendRequest(@Param("userId") Long userId, @Param("receiverId") Long receiverId);
 
      @Query(value = """
          SELECT EXISTS (
@@ -75,7 +77,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
                AND fr.request_status = 'REQUESTED'
          )
      """, nativeQuery = true)
-     boolean isExistedFriendRequest(@Param("userId") Long userId, @Param("receiverId") Long receiverId);
+     Integer isExistedFriendRequest(@Param("userId") Long userId, @Param("receiverId") Long receiverId);
 
 
      @Query(value = """
@@ -90,7 +92,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
                )
          )
      """, nativeQuery = true)
-     boolean isAlreadyFriends(@Param("userId") Long userId, @Param("friendId") Long friendId);
+     Integer isAlreadyFriends(@Param("userId") Long userId, @Param("friendId") Long friendId);
 
      @Query(value = """
      SELECT fr.friend_request_id AS friendRequestId,
@@ -101,6 +103,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
      FROM friend_request fr
      JOIN users u ON u.user_id = fr.requester_id
      WHERE fr.receiver_id = :userId AND fr.request_status = 'REQUESTED'
+     ORDER BY fr.created_at DESC
 
      """, countQuery = """
         SELECT COUNT(*)
@@ -112,13 +115,13 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
 
      @Query(value = """
         SELECT
-        u.user_id AS userId,
+        u.user_id AS id,
         u.name AS name,
         u.email AS email,
         u.profile_url AS profileUrl,
         CASE
-          WHEN fr.friend_request_id IS NOT NULL THEN true
-          ELSE false
+          WHEN fr.friend_request_id IS NOT NULL THEN 1
+          ELSE 0
         END AS isFriend
         FROM users u
         LEFT JOIN friend_request fr
@@ -128,15 +131,25 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
           OR
           (fr.requester_id = u.user_id AND fr.receiver_id = :userId)
         )
-        WHERE (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
-        OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
+        WHERE ( (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
+             OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
+             )
         ORDER BY u.name ASC, u.email ASC
          """,
+             countQuery = """
+               SELECT COUNT(*)
+               FROM users u
+               WHERE (
+                (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
+                OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
+               )
+         """,
              nativeQuery = true)
-     List<Object> searchUsersWithFriendStatus(
+     Page<UserWithFriendStatusProjection> searchUsersWithFriendStatus(
              @Param("userId") Long userId,
              @Param("searchType") String searchType,
-             @Param("query") String query
+             @Param("query") String query,
+             Pageable pageable
      );
 
 
