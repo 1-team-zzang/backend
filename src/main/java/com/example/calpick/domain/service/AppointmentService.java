@@ -85,7 +85,7 @@ public class AppointmentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = dto.getStartAt().format(formatter) + " ~ " + dto.getEndAt().format(formatter);
 
-        mailService.sendSimpleMessageAsync(receiver.getEmail(),dto.requesterName, dto.getTitle(),savedNotification.getNotificationId(),date,"","REQUEST");
+        mailService.sendSimpleMessageAsync(receiver.getEmail(),dto.requesterName, dto.getTitle(),savedNotification.getNotificationId(),date,"","requestAppointment");
     }
 
     @Transactional
@@ -176,7 +176,7 @@ public class AppointmentService {
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
         //수신자 수락 알림 메일 발송
-        mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","ACCEPT");
+        mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
 
         String requesterEmail = "";
 
@@ -187,7 +187,7 @@ public class AppointmentService {
         }
 
         //요청자 알림 메일 발송
-        mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","ACCEPT");
+        mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
 
 
     }
@@ -215,6 +215,6 @@ public class AppointmentService {
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
         //요청자 알림 메일 발송
-        mailService.sendSimpleMessageAsync(requesterEmail, appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","REJECT");
+        mailService.sendSimpleMessageAsync(requesterEmail, appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","rejectAppointment");
     }
 }
