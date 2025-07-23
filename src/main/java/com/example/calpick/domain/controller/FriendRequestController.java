@@ -10,12 +10,14 @@ import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.service.FriendRequestService;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/friends")
+@Tag(name = "FriendRequest", description = "FriendRequest API")
 @RequiredArgsConstructor
 public class FriendRequestController {
 
