@@ -32,7 +32,7 @@ public class ScheduleController {
 
     @GetMapping("/user/{userId}")
     Response<CalenderResponseDto> getOthersCalendar(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                    @RequestParam("userId") Long userId,
+                                                    @PathVariable("userId") Long userId,
                                                     @RequestParam("start")LocalDate startDate,
                                                     @RequestParam("end") LocalDate endDate){
         return Response.success(scheduleService.getOtherCalendar(userDetails, userId, startDate, endDate));
