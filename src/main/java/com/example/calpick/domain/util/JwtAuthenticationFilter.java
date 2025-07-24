@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request,  HttpServletResponse response, FilterChain chain, Authentication authentication){
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long id = customUserDetails.getUserId();;
+        Long id = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String name = customUserDetails.getUsername();
 
