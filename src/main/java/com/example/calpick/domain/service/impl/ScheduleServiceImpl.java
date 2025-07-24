@@ -2,6 +2,7 @@ package com.example.calpick.domain.service.impl;
 
 import com.example.calpick.domain.dto.schedule.request.ScheduleRequestDto;
 import com.example.calpick.domain.dto.schedule.response.CalenderResponseDto;
+import com.example.calpick.domain.dto.schedule.response.ScheduleDetailResponseDto;
 import com.example.calpick.domain.dto.schedule.response.ScheduleResponseDto;
 import com.example.calpick.domain.dto.schedule.response.ScheduleShareDto;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
@@ -48,12 +49,14 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public ScheduleResponseDto getSchedule(CustomUserDetails userDetails, Long scheduleId) {
+    public ScheduleDetailResponseDto getSchedule(CustomUserDetails userDetails, Long scheduleId) {
         if( scheduleId == null ){
             throw new CalPickException(ErrorCode.INVALID_SCHEDULE_INPUT);
         }
         Schedule schedule = scheduleRepository.findScheduleByScheduleId(scheduleId).orElseThrow(() -> new CalPickException(ErrorCode.SCHEDULE_NOT_FOUND));
-        return mapper.map(schedule,ScheduleResponseDto.class);
+        ScheduleDetailResponseDto responseDto = mapper.map(schedule,ScheduleDetailResponseDto.class);
+        responseDto.setOwner(userDetails.getUserId().equals(schedule.getUser().getUserId()));
+        return responseDto;
     }
 
     private List<ScheduleResponseDto> getScheduleList(Long userId, LocalDate startDate, LocalDate endDate) {

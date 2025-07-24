@@ -3,6 +3,7 @@ package com.example.calpick.domain.controller;
 import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.schedule.request.ScheduleRequestDto;
 import com.example.calpick.domain.dto.schedule.response.CalenderResponseDto;
+import com.example.calpick.domain.dto.schedule.response.ScheduleDetailResponseDto;
 import com.example.calpick.domain.dto.schedule.response.ScheduleResponseDto;
 import com.example.calpick.domain.dto.schedule.response.ScheduleShareDto;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
@@ -39,8 +40,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/{scheduleId}")
-    Response<ScheduleResponseDto> getSchedule(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                              @PathVariable("scheduleId") Long scheduleId){
+    Response<ScheduleDetailResponseDto> getSchedule(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                    @PathVariable("scheduleId") Long scheduleId){
         return Response.success(scheduleService.getSchedule(userDetails, scheduleId));
     }
 
