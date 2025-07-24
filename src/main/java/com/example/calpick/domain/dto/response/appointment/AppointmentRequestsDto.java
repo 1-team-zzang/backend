@@ -25,6 +25,7 @@ public class AppointmentRequestsDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime inviteAt;
     public AppointmentStatus status;
+    public String receiverName;
 
 
 }

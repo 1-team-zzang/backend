@@ -96,23 +96,27 @@ public class AppointmentService {
     public AppointmentRequestListResponseDto getAppointmentRequestsList(String email,int page, int size, String status){
         Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         User user = userRepository.findByEmail(email).get();
-        List<AppointmentStatus> statusList;
+        Page<Appointment> appointments = Page.empty();
 
-        if(status.equals("REQUESTED")){ //대기 중 약속 목록
-
-            statusList = List.of(AppointmentStatus.REQUESTED);
-        }else{ //응답한 약속 목록
-            statusList = List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED);
-        }
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
 
         modelMapper.typeMap(Appointment.class, AppointmentRequestsDto.class)
                 .addMapping(Appointment::getAppointmentId, AppointmentRequestsDto::setId)
                 .addMapping(Appointment::getCreatedAt, AppointmentRequestsDto::setInviteAt)
                 .addMapping(Appointment::getRequesterName, AppointmentRequestsDto::setRequesterName)
-                .addMapping(Appointment::getAppointmentStatus, AppointmentRequestsDto::setStatus);
+                .addMapping(Appointment::getAppointmentStatus, AppointmentRequestsDto::setStatus)
+                .addMapping(appointment -> appointment.getReceiver().getName(),AppointmentRequestsDto::setReceiverName);
 
-        Page<Appointment> appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),statusList,pageable);
+        if(status.equals("PENDING")){
+            appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),
+                    List.of(AppointmentStatus.REQUESTED), pageable);
+        }else if(status.equals("RESPONDED")){
+            appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),
+                    List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED), pageable);
+        }else if(status.equals("SENT")){
+            appointments = appointmentRepository.findByRequesterIdAndStatuses(user.getUserId(),
+                    List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED), pageable);
+        }
 
         List<AppointmentRequestsDto> dtoList = appointments
                 .getContent()
