@@ -183,7 +183,6 @@ public class AppointmentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
-        //수신자 수락 알림 메일 발송
         mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
 
         String requesterEmail = "";
@@ -194,10 +193,7 @@ public class AppointmentService {
             requesterEmail = appointment.getRequesterEmail();
         }
 
-        //요청자 알림 메일 발송
         mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
-
-
     }
 
 
