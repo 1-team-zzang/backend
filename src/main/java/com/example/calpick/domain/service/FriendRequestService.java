@@ -181,7 +181,8 @@ public class FriendRequestService {
                                 p.getName(),
                                 p.getEmail(),
                                 p.getProfileUrl(),
-                                p.getIsFriend() == 1
+                                p.getIsFriend() == 1,
+                                p.getIsRequested() == 1
                         ));
         return UsersWithFriendStatusListResponseDto.toResponseDto(page,dtoPage.getTotalPages(),dtoPage.getContent());
 

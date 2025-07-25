@@ -15,4 +15,5 @@ public class UserWithFriendStatusDto {
     public String email;
     public String profileUrl;
     public Boolean isFriend;
+    public Boolean isRequested;
 }

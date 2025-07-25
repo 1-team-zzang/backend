@@ -6,4 +6,5 @@ public interface UserWithFriendStatusProjection {
     String getEmail();
     String getProfileUrl();
     Integer getIsFriend();
+    Integer getIsRequested();
 }
