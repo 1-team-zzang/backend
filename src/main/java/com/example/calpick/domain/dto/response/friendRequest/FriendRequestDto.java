@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class FriendRequestDto {
     public Long friendRequestId;
-    public String email;
     public String name;
+    public String email;
     public String profileUrl;
 }

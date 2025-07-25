@@ -153,7 +153,7 @@ public class FriendRequestService {
         Page<FriendResponseDto> pages=  friendRequestRepository.getFriendList(user.getUserId(),pageable);
         List<FriendResponseDto> dtoList = pages.getContent();
 
-       return FriendsListResponseDto.toResponseDto(page,size,dtoList);
+       return FriendsListResponseDto.toResponseDto(page,pages.getTotalPages(),dtoList);
     }
 
     @Transactional(rollbackFor = Exception.class)
