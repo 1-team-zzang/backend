@@ -164,11 +164,11 @@ public class AppointmentService {
         appointment.setAppointmentStatus(AppointmentStatus.ACCEPTED);
         appointment.setModifiedAt(LocalDateTime.now());
 
-        //수락자 회원 일정 추가
+
         Schedule receiverSchedule = Schedule.of(appointment,appointment.getReceiver());
         scheduleRepository.save(receiverSchedule);
 
-        if(appointment.getRequester()!=null){ //회원 요청자 일정 추가
+        if(appointment.getRequester()!=null){
             Schedule requesterSchedule = Schedule.of(appointment,appointment.getRequester());
             scheduleRepository.save(requesterSchedule);
         }

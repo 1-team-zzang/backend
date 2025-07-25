@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class UserWithFriendStatusDto {
     public Long id;
-    public String email;
     public String name;
+    public String email;
     public String profileUrl;
     public Boolean isFriend;
 }
