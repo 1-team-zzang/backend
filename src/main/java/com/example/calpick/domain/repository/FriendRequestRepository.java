@@ -122,7 +122,11 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
         CASE
           WHEN fr.friend_request_id IS NOT NULL THEN 1
           ELSE 0
-        END AS isFriend
+        END AS isFriend,
+        CASE
+          WHEN req.friend_request_id IS NOT NULL THEN 1
+          ELSE 0
+        END AS isRequested
         FROM users u
         LEFT JOIN friend_request fr
         ON fr.request_status = 'ACCEPTED'
@@ -130,6 +134,13 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
           (fr.requester_id = :userId AND fr.receiver_id = u.user_id)
           OR
           (fr.requester_id = u.user_id AND fr.receiver_id = :userId)
+        )
+        LEFT JOIN friend_request req
+         ON req.request_status = 'REQUESTED'
+         AND (
+           (req.receiver_id = :userId AND req.requester_id = u.user_id)
+           OR
+           (req.receiver_id = u.user_id AND req.requester_id = :userId)
         )
         WHERE ( (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
              OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
