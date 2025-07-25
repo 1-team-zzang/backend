@@ -7,6 +7,7 @@ import com.example.calpick.domain.dto.response.appointment.AppointmentRequestsDt
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.entity.*;
 import com.example.calpick.domain.entity.enums.AppointmentStatus;
+import com.example.calpick.domain.entity.enums.ColorTypes;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
 import com.example.calpick.domain.repository.*;
 import com.example.calpick.global.exception.CalPickException;
@@ -25,6 +26,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.calpick.domain.util.EnumUtil.fromString;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +67,7 @@ public class AppointmentService {
         appointment.setRequester(null);
         appointment.setAppointmentId(null);
         appointment.setAppointmentStatus(AppointmentStatus.REQUESTED);
+        appointment.setColor(fromString(ColorTypes.class, dto.getColor()));
         if(dto.requesterEmail.isEmpty()){ //요청자가 회원일경우
             appointment.setRequester(user);
             appointment.setRequesterName(user.getName());
@@ -92,23 +96,27 @@ public class AppointmentService {
     public AppointmentRequestListResponseDto getAppointmentRequestsList(String email,int page, int size, String status){
         Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         User user = userRepository.findByEmail(email).get();
-        List<AppointmentStatus> statusList;
+        Page<Appointment> appointments = Page.empty();
 
-        if(status.equals("REQUESTED")){ //대기 중 약속 목록
-
-            statusList = List.of(AppointmentStatus.REQUESTED);
-        }else{ //응답한 약속 목록
-            statusList = List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED);
-        }
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
 
         modelMapper.typeMap(Appointment.class, AppointmentRequestsDto.class)
                 .addMapping(Appointment::getAppointmentId, AppointmentRequestsDto::setId)
                 .addMapping(Appointment::getCreatedAt, AppointmentRequestsDto::setInviteAt)
                 .addMapping(Appointment::getRequesterName, AppointmentRequestsDto::setRequesterName)
-                .addMapping(Appointment::getAppointmentStatus, AppointmentRequestsDto::setStatus);
+                .addMapping(Appointment::getAppointmentStatus, AppointmentRequestsDto::setStatus)
+                .addMapping(appointment -> appointment.getReceiver().getName(),AppointmentRequestsDto::setReceiverName);
 
-        Page<Appointment> appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),statusList,pageable);
+        if(status.equals("PENDING")){
+            appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),
+                    List.of(AppointmentStatus.REQUESTED), pageable);
+        }else if(status.equals("RESPONDED")){
+            appointments = appointmentRepository.findByReceiverIdAndStatuses(user.getUserId(),
+                    List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED), pageable);
+        }else if(status.equals("SENT")){
+            appointments = appointmentRepository.findByRequesterIdAndStatuses(user.getUserId(),
+                    List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED), pageable);
+        }
 
         List<AppointmentRequestsDto> dtoList = appointments
                 .getContent()
@@ -175,7 +183,6 @@ public class AppointmentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
-        //수신자 수락 알림 메일 발송
         mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
 
         String requesterEmail = "";
@@ -186,10 +193,7 @@ public class AppointmentService {
             requesterEmail = appointment.getRequesterEmail();
         }
 
-        //요청자 알림 메일 발송
         mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
-
-
     }
 
 

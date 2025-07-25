@@ -1,7 +1,9 @@
 package com.example.calpick.domain.util;
 
 import com.example.calpick.domain.dto.auth.request.LoginRequest;
+import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
+import com.example.calpick.domain.dto.user.UserDto;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,8 +57,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     // 로그인 성공시 실행되는 메소드 - JWT 발급
     @Override
-    protected void successfulAuthentication(HttpServletRequest request,  HttpServletResponse response, FilterChain chain,Authentication authentication){
+    protected void successfulAuthentication(HttpServletRequest request,  HttpServletResponse response, FilterChain chain, Authentication authentication){
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long id = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String name = customUserDetails.getUsername();
 
@@ -65,7 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String accessToken = jwtUtil.createAccessToken(email, name);
+        String accessToken = jwtUtil.createAccessToken(id, email, name);
         String refreshToken = jwtUtil.createRefreshToken(role, email);
         ResponseCookie cookie = ResponseCookie.from("Refresh-Token", refreshToken)
                 .httpOnly(true)
@@ -78,12 +81,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         response.addHeader("Authorization", "Bearer "+accessToken);
         response.setHeader("Set-Cookie", cookie.toString());
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email));
+
+        try{
+            objectMapper.writeValue(response.getWriter(), successResponse);
+        }catch (IOException e){ throw new CalPickException(ErrorCode.INTERNAL_SERVER_ERROR);}
     }
 
     // 로그인 실패 시 실행되는 메소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed){
-        response.setStatus(401);
+        throw new CalPickException(ErrorCode.INVALID_PASSWORD);
     }
 
 }

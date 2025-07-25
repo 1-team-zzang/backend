@@ -44,11 +44,12 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setHeader("Authorization", "Bearer "+accessToken);
         }
 
+        Long userId = jwtUtil.getUserId(accessToken);
         String name = jwtUtil.getName(accessToken);
         String email = jwtUtil.getEmail(accessToken);
 
         CustomUserDetails customUserDetails = new CustomUserDetails(
-                User.builder().name(name).email(email).build());
+                User.builder().userId(userId).name(name).email(email).build());
         // Spring Security 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         // 세션에 사용자 등록
@@ -81,6 +82,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 모든 검증 통과 시 새 accessToken 발급
         return jwtUtil.createAccessToken(
+                jwtUtil.getUserId(expiredAccessToken),
                 refreshEmail,
                 jwtUtil.getName(refreshToken)
         );

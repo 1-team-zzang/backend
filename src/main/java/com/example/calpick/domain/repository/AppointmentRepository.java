@@ -40,6 +40,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
             Pageable pageable
     );
 
+    @Query("""
+    SELECT a FROM Appointment a
+    WHERE a.requester.userId = :userId AND a.appointmentStatus IN :statuses
+""")
+    Page<Appointment> findByRequesterIdAndStatuses(
+            @Param("userId") Long userId,
+            @Param("statuses") List<AppointmentStatus> statuses,
+            Pageable pageable
+    );
+
     @Override
     Optional<Appointment> findById(Long id);
 }
