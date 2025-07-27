@@ -132,7 +132,7 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new CalPickException(ErrorCode.APPOINTMENT_NOT_FOUND));
         User user = userRepository.findByEmail(email).get();
 
-        if(appointment.getReceiver().getUserId() != user.getUserId()){
+        if(appointment.getReceiver().getUserId() != user.getUserId() && appointment.getRequester().getUserId() != user.getUserId()){
             throw new CalPickException(ErrorCode.NO_ACCESS_TO_APPOINTMENT_REQUEST);
         }
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
