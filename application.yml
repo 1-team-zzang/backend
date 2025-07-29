@@ -1,15 +1,10 @@
 spring:
   application:
     name: calpick
-
-  config:
-    import: optional:classpath:../../../.env
-
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,7 +13,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         # format_sql: true
-
   mail:
     host: smtp.gmail.com
     port: 587
@@ -34,7 +28,6 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
 logging:
   level:
     root: WARN
@@ -45,7 +38,6 @@ logging:
         orm:
           connections:
             pooling: WARN
-
 jwt:
   accessToken_expire_time: 86400000
   refreshToken_expire_time: 604800000
