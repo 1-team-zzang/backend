@@ -16,7 +16,9 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "https://calpick.vercel.app/",
-                                "http://localhost:5173")
+                                "http://localhost:5173",
+                                "https://localhost:5173",
+                                "https://calpick.shop")
                         .allowedMethods("*")
                         .allowCredentials(true) // 쿠키 허용
                         .allowedHeaders("*")
