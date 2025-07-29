@@ -1,5 +1,5 @@
 FROM gradle:8.14-jdk17 AS builder
-WORKDIR /user/src
+WORKDIR /calpick-backend
 RUN gradle wrapper --gradle-version 8.5
 RUN ./gradlew clean build -x test
 
