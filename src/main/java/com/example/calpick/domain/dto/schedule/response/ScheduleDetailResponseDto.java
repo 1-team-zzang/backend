@@ -37,4 +37,5 @@ public class ScheduleDetailResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime repeatEndAt;
     public ColorTypes color;
+    public Long appointmentId;
 }
