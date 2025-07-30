@@ -82,7 +82,7 @@ jobs:
 
       # 3. 최신 이미지를 컨테이너화하여 실행시킵니다
       - name: docker run new container
-        run: sudo docker run --name calpick-backend -rm -d -p 8080:8080 ${{ secrets.DOCKER_USER }}/calpick-backend
+        run: sudo docker run --name calpick-backend --rm -d -p 8080:8080 ${{ secrets.DOCKER_USER }}/calpick-backend
 
       # 4. 미사용 이미지를 정리합니다
       - name: delete old docker image
