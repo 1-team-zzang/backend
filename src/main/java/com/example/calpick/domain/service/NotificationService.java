@@ -29,9 +29,6 @@ public class NotificationService {
     @Transactional
     public NotificationsListResponseDto getNotificationsList(int page, int size,String email) {
         User user = userRepository.findByEmail(email).get();
-        // 약속, 친구 신청 -> receiver_id 가 내 아이디 일때,
-        // 약속, 친구 거절 -> requester_id 가 내 아이디 일때,
-        // 약속, 친구 수락 -> request_id 가 내 아이디 이거나(reveiver_name) or receiver_id 가 내 아이디
         Pageable pageable = PageRequest.of(page-1, size);
         Page<NotificationProjection> pages = notificationRepository.findRelevantNotifications(user.getUserId(),pageable);
 
