@@ -41,6 +41,10 @@ public class CustomUserDetails implements UserDetails {
         return user.getEmail();
     }
 
+    public String getProfileUrl(){
+        return user.getProfileUrl();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return user.getUserStatus() == UserStatus.ACTIVE;
