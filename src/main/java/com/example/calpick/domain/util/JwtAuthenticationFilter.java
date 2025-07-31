@@ -62,6 +62,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Long id = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String name = customUserDetails.getUsername();
+        String profileUrl = customUserDetails.getProfileUrl();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -84,7 +85,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email));
+        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email, profileUrl));
 
         try{
             objectMapper.writeValue(response.getWriter(), successResponse);
