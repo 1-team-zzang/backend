@@ -63,8 +63,10 @@ public class FriendRequestService {
 
         FriendRequest savedFriendRequest = friendRequestRepository.save(friendRequest);
 
+        String message = user.getName() + "님이 친구 요청을 보냈습니다.";
+
         //수신자에게 친구 신청 알람 메일 전송
-        Notification notification = Notification.of(user, friend, NotificationEvent.REQUEST,"친구 요청입니다");
+        Notification notification = Notification.of(user, friend, NotificationEvent.REQUEST,message);
         Notification savedNotification = notificationRepository.save(notification);
 
 
@@ -72,7 +74,7 @@ public class FriendRequestService {
         notificationTypeRepository.save(notificationType);
 
 
-        mailService.sendSimpleMessageAsync(friend.getEmail(),user.getName(),"",savedNotification.getNotificationId(),"","","requestFriend");
+        mailService.sendSimpleMessageAsync(friend.getEmail(),user.getName(),"",savedNotification.getNotificationId(),"","https://calpick.vercel.app/","requestFriend");
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -101,7 +103,7 @@ public class FriendRequestService {
 
         friendRequest.setRequestStatus(RequestStatus.ACCEPTED);
 
-        Notification notification = Notification.of(requester,receiver,NotificationEvent.ACCEPT,"친구가 추가되었습니다");
+        Notification notification = Notification.of(requester,receiver,NotificationEvent.ACCEPT,"친구가 되셨습니다.");
         notificationRepository.save(notification);
 
 
@@ -110,11 +112,11 @@ public class FriendRequestService {
 
 
         //수신자 친구 확정 메일 발송
-        mailService.sendSimpleMessageAsync(receiver.getEmail(),requester.getName(),"",notification.getNotificationId(),"","","acceptFriend");
+        mailService.sendSimpleMessageAsync(receiver.getEmail(),requester.getName(),"",notification.getNotificationId(),"","https://calpick.vercel.app/","acceptFriend");
 
 
         //요청자 친구 확정 메일 발송
-        mailService.sendSimpleMessageAsync(requester.getEmail(),receiver.getName(),"",notification.getNotificationId(),"","","acceptFriend");
+        mailService.sendSimpleMessageAsync(requester.getEmail(),receiver.getName(),"",notification.getNotificationId(),"","https://calpick.vercel.app/","acceptFriend");
 
 
     }
@@ -124,14 +126,16 @@ public class FriendRequestService {
     public void rejectRequest(FriendRequest friendRequest,User receiver, User requester) throws Exception {
         friendRequestRepository.delete(friendRequest);
 
-        Notification notification = Notification.of(requester,receiver,NotificationEvent.REJECT,"친구 요청이 거절되었습니다");
+        String message = receiver.getName()+ "님이 친구 요청을 거절하셨습니다.";
+
+        Notification notification = Notification.of(requester,receiver,NotificationEvent.REJECT,message);
         notificationRepository.save(notification);
 
         NotificationType notificationType = NotificationType.of(com.example.calpick.domain.entity.enums.NotificationType.FRIEND,friendRequest.getFriendRequestId(),notification);
         notificationTypeRepository.save(notificationType);
 
         //요청자 알림 메일 발송
-        mailService.sendSimpleMessageAsync(requester.getEmail(), receiver.getName(),"",notification.getNotificationId(),"","","rejectFriend");
+        mailService.sendSimpleMessageAsync(requester.getEmail(), receiver.getName(),"",notification.getNotificationId(),"","https://calpick.vercel.app/","rejectFriend");
     }
 
     @Transactional
