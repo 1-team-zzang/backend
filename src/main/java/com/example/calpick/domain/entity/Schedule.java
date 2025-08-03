@@ -55,6 +55,7 @@ public class Schedule {
         schedule.setStartAt(appointment.getStartAt());
         schedule.setEndAt(appointment.getEndAt());
         schedule.setCreatedAt(LocalDateTime.now());
+        schedule.setContent(appointment.getContent());
         schedule.setIsRepeated(false);
         schedule.setIsVisible(true);
         schedule.setIsAllDay(appointment.getIsAllDay());
