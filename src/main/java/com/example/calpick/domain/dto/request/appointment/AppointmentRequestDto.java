@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 public class AppointmentRequestDto {
     public String title;
     public String content;
+    public String message;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public LocalDateTime startAt;
 
