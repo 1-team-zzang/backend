@@ -141,7 +141,8 @@ public class AppointmentService {
                 .addMapping(Appointment::getAppointmentId, AppointmentRequestDetailResponseDto::setId)
                 .addMapping(Appointment::getCreatedAt, AppointmentRequestDetailResponseDto::setInviteAt)
                 .addMapping(Appointment::getRequesterName, AppointmentRequestDetailResponseDto::setRequesterName)
-                .addMapping(Appointment::getAppointmentStatus,AppointmentRequestDetailResponseDto::setStatus);
+                .addMapping(Appointment::getAppointmentStatus,AppointmentRequestDetailResponseDto::setStatus)
+                .addMapping(Appointment::getMessage,AppointmentRequestDetailResponseDto::setContent);
         return modelMapper.map(appointment, AppointmentRequestDetailResponseDto.class);
     }
 

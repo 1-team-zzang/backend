@@ -23,6 +23,7 @@ public class Appointment {
 
     private String title;
     private String content;
+    private String message;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private String requesterName;
