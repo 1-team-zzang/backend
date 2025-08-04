@@ -88,7 +88,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         while (currentStart.isBefore(rangeEnd.plusMinutes(1)) && repeatCount != null && count < repeatCount) {
             // 현재 인스턴스가 범위 내에 있는 경우만 추가
-            if (currentStart.isAfter(rangeStart.minusMinutes(1)) || currentEnd.isBefore(rangeEnd.plusMinutes(1))) {
+            if (!(currentEnd.isBefore(rangeStart.plusMinutes(1)) || currentStart.isAfter(rangeEnd.plusMinutes(1)))) {
                 ScheduleResponseDto dto = mapper.map(schedule, ScheduleResponseDto.class);
                 dto.setStartAt(currentStart);
                 dto.setEndAt(currentEnd);

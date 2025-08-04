@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/signup","/api/auth/login","/","/swagger-ui/**","/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/signup","/api/auth/login","/api/auth/kakao/signup","/","/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/appointments/requests").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schedules/user/**").permitAll()
                         .anyRequest().authenticated()

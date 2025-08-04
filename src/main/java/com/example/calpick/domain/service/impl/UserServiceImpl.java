@@ -9,6 +9,7 @@ import com.example.calpick.domain.repository.UserRepository;
 import com.example.calpick.domain.service.UserService;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto editProfile(CustomUserDetails userDetails, UserProfileRequestDto request) {
+    public UserDto editProfile(CustomUserDetails userDetails, @Valid UserProfileRequestDto request) {
         if (userDetails.getEmail() == null) throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
         User user = userRepository.findByEmail(userDetails.getEmail())
                 .orElseThrow(()->new CalPickException(ErrorCode.INVALID_EMAIL));
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void editPassword(CustomUserDetails userDetails, UserPasswordRequestDto request) {
+    public void editPassword(CustomUserDetails userDetails, @Valid UserPasswordRequestDto request) {
         if (userDetails.getEmail() == null) throw new CalPickException(ErrorCode.UNAUTHORIZED_USER);
         User user = userRepository.findByEmail(userDetails.getEmail())
                 .orElseThrow(()->new CalPickException(ErrorCode.INVALID_EMAIL));
