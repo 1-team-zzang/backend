@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public SignupResponse signUp(SignupRequest dto) {
         String email = dto.getEmail();
-        if (userRepository.existsByEmail(email)==1){
+        if (userRepository.existsByEmail(email, LoginType.NORMAL.name())==1){
             throw new CalPickException(ErrorCode.DUPLICATED_EMAIL);
         }
         // 이메일 형식, 비밀번호, 필수 입력값 검증 Exception 추가

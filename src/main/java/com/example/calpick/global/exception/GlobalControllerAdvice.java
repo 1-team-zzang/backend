@@ -4,6 +4,7 @@ import com.example.calpick.domain.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -25,6 +26,22 @@ public class GlobalControllerAdvice {
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e){
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_ERROR;
+
+        String fieldError = e.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .orElse(errorCode.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        errorCode.getStatus().getReasonPhrase(),
+                        fieldError,
+                        errorCode.getErrorCode()
+                ));
     }
 
     @ExceptionHandler(Exception.class)

@@ -46,7 +46,7 @@ public enum ErrorCode {
 
 
 
-
+    INVALID_INPUT_ERROR(HttpStatus.BAD_REQUEST, "필수 입력값이 미충족되었습니다.", "COMMON-400"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "internal server error", "COMMON-500");
 
 
