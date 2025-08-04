@@ -10,6 +10,7 @@ import com.example.calpick.domain.service.AuthService;
 import com.example.calpick.domain.service.impl.KakaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -27,7 +28,7 @@ public class AuthController {
     private final KakaoService kakaoService;
 
     @PostMapping("/kakao/signup")
-    public ResponseEntity<Response<UserDto>> kakakoSignUp(@RequestBody KakaoSignupRequest request){
+    public ResponseEntity<Response<UserDto>> kakakoSignUp(@Valid @RequestBody KakaoSignupRequest request){
         LoginResponse result = kakaoService.kakaoSignIn(request);
         ResponseCookie cookie = ResponseCookie.from("Refresh-Token", result.getRefreshToken())
                 .httpOnly(true)
@@ -43,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public Response<SignupResponse> signup(@RequestBody SignupRequest request){
+    public Response<SignupResponse> signup(@Valid @RequestBody SignupRequest request){
         return Response.success(authService.signUp(request));
     }
 
