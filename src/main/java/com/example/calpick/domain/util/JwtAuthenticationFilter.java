@@ -4,6 +4,7 @@ import com.example.calpick.domain.dto.auth.request.LoginRequest;
 import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.dto.user.UserDto;
+import com.example.calpick.domain.entity.enums.LoginType;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,6 +63,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Long id = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String name = customUserDetails.getUsername();
+        LoginType loginType = customUserDetails.getLoginType();
         String profileUrl = customUserDetails.getProfileUrl();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -85,7 +87,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email, profileUrl));
+        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email, loginType, profileUrl));
 
         try{
             objectMapper.writeValue(response.getWriter(), successResponse);
