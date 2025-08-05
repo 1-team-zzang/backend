@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -44,26 +45,34 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public SignupResponse signUp(SignupRequest dto) {
         String email = dto.getEmail();
-        if (userRepository.existsByEmail(email, LoginType.NORMAL.name())==1){
+        User user = userRepository.findByEmail(email).orElseGet(
+                ()->createNewUser(dto));
+        Set<LoginType> loginTypes = user.getLoginTypes();
+        if (loginTypes.contains(LoginType.NORMAL)){
             throw new CalPickException(ErrorCode.DUPLICATED_EMAIL);
         }
-        // 이메일 형식, 비밀번호, 필수 입력값 검증 Exception 추가
+        if(loginTypes.contains(LoginType.KAKAO)){
+            user.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+        }
+        user.getLoginTypes().add(LoginType.NORMAL);
+        User savedUser = userRepository.save(user);
+        return mapper.map(savedUser, SignupResponse.class);
+    }
 
+    @Transactional
+    public User createNewUser(SignupRequest dto){
         LocalDateTime now = LocalDateTime.now();
-        User user = User.builder()
+        return User.builder()
                 .email(dto.getEmail())
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                 .name(dto.getName())
+                .profileUrl(dto.getProfileUrl())
                 .userStatus(UserStatus.ACTIVE)
-                .loginType(LoginType.NORMAL)
                 .createdAt(now)
                 .modifiedAt(now)
                 .deletedAt(null)
                 .build();
-        User newUser = userRepository.save(user);
-        return mapper.map(newUser, SignupResponse.class);
     }
-
 
     @Override
     @Transactional

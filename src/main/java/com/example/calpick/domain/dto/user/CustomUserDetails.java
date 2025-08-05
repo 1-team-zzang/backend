@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 public class CustomUserDetails implements UserDetails {
@@ -42,8 +43,8 @@ public class CustomUserDetails implements UserDetails {
         return user.getEmail();
     }
 
-    public LoginType getLoginType(){
-        return user.getLoginType();
+    public Set<LoginType> getLoginTypes(){
+        return user.getLoginTypes();
     }
     public String getProfileUrl(){
         return user.getProfileUrl();

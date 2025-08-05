@@ -12,4 +12,5 @@ public class SignupRequest {
     private String name;
     @NotBlank
     private String password;
+    private String profileUrl;
 }
