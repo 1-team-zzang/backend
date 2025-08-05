@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -63,7 +64,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Long id = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String name = customUserDetails.getUsername();
-        LoginType loginType = customUserDetails.getLoginType();
+        Set<LoginType> loginTypes = customUserDetails.getLoginTypes();
         String profileUrl = customUserDetails.getProfileUrl();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -87,7 +88,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email, loginType, profileUrl));
+        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email, loginTypes, profileUrl));
 
         try{
             objectMapper.writeValue(response.getWriter(), successResponse);
