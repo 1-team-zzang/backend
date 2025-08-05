@@ -37,6 +37,8 @@ public class Notification {
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
+    private LocalDateTime expiredAt;
+
     public static Notification of(Appointment appointment, NotificationEvent event,String content) {
         Notification notification = new Notification();
 
@@ -51,6 +53,7 @@ public class Notification {
         notification.setEvent(event);
         notification.setCreatedAt(LocalDateTime.now());
         notification.setNotificationStatus(NotificationStatus.PENDING);
+        notification.setExpiredAt(LocalDateTime.now().plusDays(30));
 
         return notification;
     }
@@ -65,6 +68,7 @@ public class Notification {
         notification.setEvent(event);
         notification.setCreatedAt(LocalDateTime.now());
         notification.setNotificationStatus(NotificationStatus.PENDING);
+        notification.setExpiredAt(LocalDateTime.now().plusDays(30));
 
         return notification;
     }
