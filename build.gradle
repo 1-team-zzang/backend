@@ -5,14 +5,14 @@ plugins {
 }
 
 // .env
-def envFile = rootProject.file('.env')
-if (envFile.exists()) {
-	def props = new Properties()
-	props.load(new FileInputStream(envFile))
-	props.each { key, value ->
-		project.ext.set(key, value)
-	}
-}
+//def envFile = rootProject.file('.env')
+//if (envFile.exists()) {
+//	def props = new Properties()
+//	props.load(new FileInputStream(envFile))
+//	props.each { key, value ->
+//		project.ext.set(key, value)
+//	}
+//}
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -57,6 +57,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 }
 

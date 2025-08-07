@@ -4,6 +4,7 @@ import com.example.calpick.domain.dto.auth.request.LoginRequest;
 import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
 import com.example.calpick.domain.dto.user.UserDto;
+import com.example.calpick.domain.entity.enums.LoginType;
 import com.example.calpick.global.exception.CalPickException;
 import com.example.calpick.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -62,6 +64,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Long id = customUserDetails.getUserId();
         String email = customUserDetails.getEmail();
         String name = customUserDetails.getUsername();
+        Set<LoginType> loginTypes = customUserDetails.getLoginTypes();
+        String profileUrl = customUserDetails.getProfileUrl();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -84,7 +88,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email));
+        Response<UserDto> successResponse = Response.success(new UserDto(id, name, email, loginTypes, profileUrl));
 
         try{
             objectMapper.writeValue(response.getWriter(), successResponse);

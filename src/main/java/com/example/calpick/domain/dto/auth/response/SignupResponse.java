@@ -10,4 +10,5 @@ import lombok.Setter;
 public class SignupResponse {
     private String email;
     private String name;
+    private String profileUrl;
 }

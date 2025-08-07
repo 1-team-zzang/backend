@@ -1,6 +1,7 @@
 package com.example.calpick.domain.dto.user;
 
 import com.example.calpick.domain.entity.User;
+import com.example.calpick.domain.entity.enums.LoginType;
 import com.example.calpick.domain.entity.enums.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 public class CustomUserDetails implements UserDetails {
@@ -39,6 +41,13 @@ public class CustomUserDetails implements UserDetails {
 
     public String getEmail(){
         return user.getEmail();
+    }
+
+    public Set<LoginType> getLoginTypes(){
+        return user.getLoginTypes();
+    }
+    public String getProfileUrl(){
+        return user.getProfileUrl();
     }
 
     @Override
