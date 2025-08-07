@@ -33,6 +33,7 @@ public enum ErrorCode {
     INVALID_JWT_TOKEN(HttpStatus.BAD_REQUEST, "토큰이 만료되었습니다. 다시 로그인해주세요.", "AUTH-05"),
 
     UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "인증이 필요합니다. 로그인 후 다시 시도해주세요.", "AUTH-06"),
+    KAKAO_TOKEN_REQUEST_FAILED(HttpStatus.BAD_REQUEST, "카카오 토큰 인증이 실패했습니다. 다시 시도해주세요.", "AUTH-07"),
 
     //친구
     NO_ACCESS_TO_FRIEND_REQUEST(HttpStatus.FORBIDDEN,"해당 친구 요청에 대한 권한이 없습니다.","FRD_01"),
