@@ -24,7 +24,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
             SELECT s FROM Schedule s 
             WHERE s.user.userId = :userId 
             AND (
-                (s.isRepeated = false AND s.startAt <= :endDate AND s.endAt >= :startDate)
+                (s.isRepeated = false AND s.startAt <= :endDate AND s.startAt >= :startDate)
                 OR
                 (s.isRepeated = true AND s.startAt <= :endDate AND s.repeatEndAt >= :startDate)
             )
