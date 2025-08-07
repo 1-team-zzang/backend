@@ -1,7 +1,6 @@
 package com.example.calpick.domain.controller;
-import com.example.calpick.domain.dto.auth.request.KakaoSignupRequest;
+import com.example.calpick.domain.dto.auth.request.KakaoCodeRequest;
 import com.example.calpick.domain.dto.auth.request.SignupRequest;
-import com.example.calpick.domain.dto.auth.response.LoginResponse;
 import com.example.calpick.domain.dto.auth.response.SignupResponse;
 import com.example.calpick.domain.dto.response.Response;
 import com.example.calpick.domain.dto.user.CustomUserDetails;
@@ -17,6 +16,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 
 @RestController
@@ -28,19 +28,22 @@ public class AuthController {
     private final KakaoService kakaoService;
 
     @PostMapping("/kakao/signup")
-    public ResponseEntity<Response<UserDto>> kakakoSignUp(@Valid @RequestBody KakaoSignupRequest request){
-        LoginResponse result = kakaoService.kakaoSignIn(request);
-        ResponseCookie cookie = ResponseCookie.from("Refresh-Token", result.getRefreshToken())
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .sameSite("None")
-                .maxAge(60 * 60 * 24 * 7)
-                .build();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getAccessToken())
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Response.success(result.getUserDto()));
+    public Mono<ResponseEntity<Response<UserDto>>> kakaoAuthorize(@Valid @RequestBody KakaoCodeRequest request){
+        return kakaoService.kakaoAuthorize(request)
+                .map(result -> {
+                    ResponseCookie cookie = ResponseCookie.from("Refresh-Token", result.getRefreshToken())
+                            .httpOnly(true)
+                            .secure(true)
+                            .path("/")
+                            .sameSite("None")
+                            .maxAge(60 * 60 * 24 * 7)
+                            .build();
+
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getAccessToken())
+                            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                            .body(Response.success(result.getUserDto()));
+                });
     }
 
     @PostMapping("/signup")
