@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -56,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/signup","/api/auth/login","/api/auth/kakao/signup","/","/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/appointments/requests").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/schedules/user/**").permitAll()
+                        .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/api/schedules/\\d+")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

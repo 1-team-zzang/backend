@@ -55,7 +55,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
         Schedule schedule = scheduleRepository.findScheduleByScheduleId(scheduleId).orElseThrow(() -> new CalPickException(ErrorCode.SCHEDULE_NOT_FOUND));
         ScheduleDetailResponseDto responseDto = mapper.map(schedule,ScheduleDetailResponseDto.class);
-        responseDto.setOwner(userDetails.getUserId().equals(schedule.getUser().getUserId()));
+        responseDto.setOwner( userDetails ==null? false : userDetails.getUserId().equals(schedule.getUser().getUserId()));
         return responseDto;
     }
 
@@ -88,7 +88,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         while (currentStart.isBefore(rangeEnd.plusMinutes(1)) && repeatCount != null && count < repeatCount) {
             // 현재 인스턴스가 범위 내에 있는 경우만 추가
-            if (currentStart.isAfter(rangeStart.minusMinutes(1)) || currentEnd.isBefore(rangeEnd.plusMinutes(1))) {
+            if (currentStart.isAfter(rangeStart.minusMinutes(1))) {
                 ScheduleResponseDto dto = mapper.map(schedule, ScheduleResponseDto.class);
                 dto.setStartAt(currentStart);
                 dto.setEndAt(currentEnd);

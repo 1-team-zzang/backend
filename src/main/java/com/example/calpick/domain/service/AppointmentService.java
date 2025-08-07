@@ -77,9 +77,10 @@ public class AppointmentService {
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
 
+        String message = dto.getRequesterName()+"님이 약속을 신청하셨습니다.";
 
         //수신자에게 신청 알람 메일 전송
-        Notification notification = Notification.of(savedAppointment,NotificationEvent.REQUEST,dto.content);
+        Notification notification = Notification.of(savedAppointment,NotificationEvent.REQUEST,message);
         Notification savedNotification = notificationRepository.save(notification);
 
 
@@ -89,7 +90,7 @@ public class AppointmentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = dto.getStartAt().format(formatter) + " ~ " + dto.getEndAt().format(formatter);
 
-        mailService.sendSimpleMessageAsync(receiver.getEmail(),dto.requesterName, dto.getTitle(),savedNotification.getNotificationId(),date,"","requestAppointment");
+        mailService.sendSimpleMessageAsync(receiver.getEmail(),dto.requesterName, dto.getTitle(),savedNotification.getNotificationId(),date,"https://calpick.vercel.app/","requestAppointment");
     }
 
     @Transactional
@@ -140,7 +141,8 @@ public class AppointmentService {
                 .addMapping(Appointment::getAppointmentId, AppointmentRequestDetailResponseDto::setId)
                 .addMapping(Appointment::getCreatedAt, AppointmentRequestDetailResponseDto::setInviteAt)
                 .addMapping(Appointment::getRequesterName, AppointmentRequestDetailResponseDto::setRequesterName)
-                .addMapping(Appointment::getAppointmentStatus,AppointmentRequestDetailResponseDto::setStatus);
+                .addMapping(Appointment::getAppointmentStatus,AppointmentRequestDetailResponseDto::setStatus)
+                .addMapping(Appointment::getMessage,AppointmentRequestDetailResponseDto::setContent);
         return modelMapper.map(appointment, AppointmentRequestDetailResponseDto.class);
     }
 
@@ -154,7 +156,7 @@ public class AppointmentService {
         if(status.equals("ACCEPT")){
             acceptRequest(appointment,user.getUserId(),id);
         }else if(status.equals("REJECT")){
-            rejectRequest(appointment,user.getUserId(),id,content);
+            rejectRequest(appointment,user,id,content);
         }
     }
 
@@ -173,7 +175,7 @@ public class AppointmentService {
             scheduleRepository.save(requesterSchedule);
         }
 
-        Notification notification = Notification.of(appointment,NotificationEvent.ACCEPT,"약속이 확정되었습니다");
+        Notification notification = Notification.of(appointment,NotificationEvent.ACCEPT,"약속이 확정되었습니다.");
         notificationRepository.save(notification);
 
 
@@ -183,7 +185,7 @@ public class AppointmentService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
-        mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
+        mailService.sendSimpleMessageAsync(appointment.getReceiver().getEmail(),appointment.getRequesterName(),appointment.getTitle(),notification.getNotificationId(),date,"https://calpick.vercel.app/","acceptAppointment");
 
         String requesterEmail = "";
 
@@ -193,15 +195,17 @@ public class AppointmentService {
             requesterEmail = appointment.getRequesterEmail();
         }
 
-        mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","acceptAppointment");
+        mailService.sendSimpleMessageAsync(requesterEmail,appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"https://calpick.vercel.app/","acceptAppointment");
     }
 
 
     @Transactional(rollbackFor = Exception.class)
-    public void rejectRequest(Appointment appointment,Long userId,Long id, String content) throws Exception {
+    public void rejectRequest(Appointment appointment,User user,Long id, String content) throws Exception {
         appointment.setAppointmentStatus(AppointmentStatus.REJECTED);
 
-        Notification notification = Notification.of(appointment,NotificationEvent.REJECT,content);
+        String message = user.getName()+"님이 약속을 거절하셨습니다.";
+
+        Notification notification = Notification.of(appointment,NotificationEvent.REJECT,message);
         notificationRepository.save(notification);
 
         NotificationType notificationType = NotificationType.of(com.example.calpick.domain.entity.enums.NotificationType.APPOINTMENT,appointment.getAppointmentId(),notification);
@@ -219,6 +223,6 @@ public class AppointmentService {
         String date = appointment.getStartAt().format(formatter) + " ~ " + appointment.getEndAt().format(formatter);
 
         //요청자 알림 메일 발송
-        mailService.sendSimpleMessageAsync(requesterEmail, appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"","rejectAppointment");
+        mailService.sendSimpleMessageAsync(requesterEmail, appointment.getReceiver().getName(),appointment.getTitle(),notification.getNotificationId(),date,"https://calpick.vercel.app/","rejectAppointment");
     }
 }

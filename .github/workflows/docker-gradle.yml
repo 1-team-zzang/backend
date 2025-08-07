@@ -11,6 +11,9 @@ permissions:
 jobs:
   # Spring Boot 애플리케이션을 빌드하여 도커허브에 푸시하는 과정
   build-docker-image:
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'pull_request' && github.base_ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -70,8 +73,8 @@ jobs:
 
       # 3. 최신 이미지를 컨테이너화하여 실행시킵니다
       - name: docker run new container
-        run: |
-          sudo docker run --name calpick-backend -d -p 8080:8080 \
+         run: |
+          sudo docker run --name calpick-backend --rm -d -p 8080:8080 \
           -e JWT_SECRET="${{ secrets.JWT_SECRET_KEY }}" \
           -e DB_URL="${{ secrets.DB_URL }}" \
           -e DB_USERNAME="${{ secrets.DB_USERNAME }}" \
