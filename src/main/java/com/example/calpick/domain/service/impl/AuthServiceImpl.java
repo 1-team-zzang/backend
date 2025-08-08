@@ -83,6 +83,7 @@ public class AuthServiceImpl implements AuthService {
         // SOFT DELETE
         user.setDeletedAt(LocalDateTime.now());
         user.setUserStatus(UserStatus.DELETED);
+        user.setEmail(null);
         userRepository.save(user);
 
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")

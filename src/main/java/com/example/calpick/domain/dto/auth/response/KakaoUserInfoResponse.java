@@ -25,6 +25,9 @@ public class KakaoUserInfoResponse {
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class KakaoAccount {
+        @JsonProperty("email")
+        public String email;
+
         @JsonProperty("profile")
         private Profile profile;
 
@@ -43,7 +46,4 @@ public class KakaoUserInfoResponse {
             public String profileImageUrl;
         }
     }
-
-    @JsonProperty("email")
-    public String email;
 }

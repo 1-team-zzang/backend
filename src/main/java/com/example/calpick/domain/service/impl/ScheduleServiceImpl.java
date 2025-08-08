@@ -11,6 +11,7 @@ import com.example.calpick.domain.entity.User;
 import com.example.calpick.domain.entity.enums.ColorTypes;
 import com.example.calpick.domain.entity.enums.RepeatRule;
 import com.example.calpick.domain.entity.enums.RepeatType;
+import com.example.calpick.domain.entity.enums.UserStatus;
 import com.example.calpick.domain.repository.ScheduleRepository;
 import com.example.calpick.domain.repository.UserRepository;
 import com.example.calpick.domain.service.ScheduleService;
@@ -127,6 +128,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public CalenderResponseDto getOtherCalendar(CustomUserDetails userDetails, Long calendarUserId, LocalDate startDate, LocalDate endDate) {
         User owner = userRepository.findById(calendarUserId).orElseThrow(()->new CalPickException(ErrorCode.SCHEDULE_NOT_FOUND));
+        if (owner.getUserStatus() != UserStatus.ACTIVE) throw new CalPickException(ErrorCode.SCHEDULE_NOT_FOUND);
+
         CalenderResponseDto responseDto = new CalenderResponseDto();
         if (userDetails == null || !userDetails.getEmail().equals(owner.getEmail())) responseDto.setOwner(false);
         else responseDto.setOwner(true);
