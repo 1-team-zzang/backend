@@ -107,7 +107,7 @@ public class KakaoService{
     @Transactional
     public LoginResponse kakaoSignIn(KakaoUserInfoResponse infoResponse) {
         // 이메일로 유저를 찾음 -> 없으면 입력받은 것으로 생성
-        User user = userRepository.findByEmail(infoResponse.getEmail())
+        User user = userRepository.findByEmail(infoResponse.getKakaoAccount().getEmail())
                 .orElseGet(()->createNewUser(infoResponse));
         if (user.getKakaoId() == null){
             // 카카오 로그인 한 적 없는 사람
@@ -122,7 +122,7 @@ public class KakaoService{
     public User createNewUser(KakaoUserInfoResponse request){
         LocalDateTime now = LocalDateTime.now();
         return User.builder()
-                .email(request.getEmail())
+                .email(request.getKakaoAccount().getEmail())
                 .name(request.getKakaoAccount().getProfile().getName())
                 .userStatus(UserStatus.ACTIVE)
                 .createdAt(now)

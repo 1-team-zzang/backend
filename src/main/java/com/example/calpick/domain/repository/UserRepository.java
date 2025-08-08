@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(
             value = " select user_id, email, password, name, profile_url, user_status, login_types, created_at, modified_at, deleted_at, share_token, kakao_id " +
-                    " from users where kakao_id=:kakaoId",
+                    " from users where kakao_id=:kakaoId and user_status='ACTIVE' ",
             nativeQuery = true
     )
     Optional<User> findByUid(@Param("kakaoId") Long kakaoId);
