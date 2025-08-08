@@ -116,7 +116,7 @@ public class AppointmentService {
                     List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED), pageable);
         }else if(status.equals("SENT")){
             appointments = appointmentRepository.findByRequesterIdAndStatuses(user.getUserId(),
-                    List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED), pageable);
+                    List.of(AppointmentStatus.ACCEPTED, AppointmentStatus.REJECTED,AppointmentStatus.REQUESTED), pageable);
         }
 
         List<AppointmentRequestsDto> dtoList = appointments
