@@ -84,7 +84,7 @@ jobs:
             -e SWAGGER_URL="${{ secrets.SWAGGER_URL }}" \
             -e KAKAO_CLIENT_ID="${{ secrets.KAKAO_CLIENT_ID }}" \
             -e KAKAO_CLIENT_SECRET="${{ secrets.KAKAO_CLIENT_SECRET }}" \
-            -e KAKAO_REDIRECT_DEVELOP="${{ secrets.KAKAO_REDIRECT_DEVELOP }}" \
+            -e KAKAO_DEPLOY_REDIRECT_URL="${{ secrets.KAKAO_DEPLOY_REDIRECT_URL }}" \
             ${{ secrets.DOCKER_USER }}/calpick-backend
 
       # 4. 미사용 이미지를 정리합니다
