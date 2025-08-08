@@ -25,7 +25,7 @@ public class User {
     private String name;
     private String profileUrl;
     private String shareToken;
-    private String idToken; // 카카오 로그인에서 받은 ID 토큰
+    private Long kakaoId; // 카카오 로그인에서 받은 ID 토큰
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
