@@ -22,7 +22,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -42,27 +41,16 @@ public class KakaoService{
     public Mono<LoginResponse> kakaoAuthorize(KakaoCodeRequest request) {
         return getKakaoToken(request.getCode()) // 1. 인증 코드로 토큰 발급
                 .flatMap(tokenResp -> {
-                            String idToken = tokenResp.getIdToken();
-                            if (idToken == null) {
-                                return Mono.error(new CalPickException(ErrorCode.KAKAO_TOKEN_REQUEST_FAILED, "KAKAO Id Token이 없습니다."));
-                            }
-                            // 2. idToken으로 이미 존재하는 사용자인지 DB 조회
-                            return Mono.just(idToken)
-                                    .flatMap(uid ->
-                                            Mono.justOrEmpty(userRepository.findByUid(uid))
-                                                    // 3. 이미 존재하는 유저일 경우 로그인으로 넘어감
-                                                    .flatMap(user -> Mono.just(kakaoLogin(user)))
-                                                    // 4. 기존 카카오 로그인 유저가 아니므로 정보 받아와서 저장
-                                                    .switchIfEmpty(
-                                                            getKakaoUserInfo(tokenResp.getAccessToken())
-                                                        .flatMap(userInfo->{
-                                                            return Mono.fromCallable(()->kakaoSignIn(userInfo, idToken));
-                                                        })
-                                                    )
-                                    );
-                            });
-
-
+                    String accessToken = tokenResp.getAccessToken();
+                    if (accessToken==null){
+                        return Mono.error(new CalPickException(ErrorCode.KAKAO_TOKEN_REQUEST_FAILED, "Kakao AccessToken이 없습니다."));
+                    }
+                    // 2. accessToken으로 사용자 정보 요청
+                    return getKakaoUserInfo(accessToken)
+                        .flatMap(userInfo->
+                            Mono.fromCallable(()->kakaoSignIn(userInfo))
+                        );
+                });
     }
 
     // 인증 코드로 토큰 요청 받기
@@ -81,7 +69,7 @@ public class KakaoService{
                 .retrieve()
                 .bodyToMono(KakaoTokenResponse.class)
                 .onErrorMap(e ->
-                        new CalPickException(ErrorCode.KAKAO_TOKEN_REQUEST_FAILED, "카카오 토큰 요청이 실패하였습니다.")
+                        new CalPickException(ErrorCode.KAKAO_TOKEN_REQUEST_FAILED, "카카오 토큰 요청이 실패하였습니다."+e)
                 );
     }
 
@@ -98,11 +86,10 @@ public class KakaoService{
                 .retrieve()
                 .bodyToMono(KakaoUserInfoResponse.class)
                 .onErrorMap(e ->
-                        new CalPickException(ErrorCode.KAKAO_TOKEN_REQUEST_FAILED, "카카오 사용자 정보 조회에 실패하였습니다.")
+                        new CalPickException(ErrorCode.KAKAO_TOKEN_REQUEST_FAILED, "카카오 사용자 정보 조회에 실패하였습니다."+e)
                 );
     }
 
-    //idToken으로 조회된 유저 있을 경우 로그인으로 넘어감
     public LoginResponse kakaoLogin(User user){
         Long id = user.getUserId();
         String email = user.getEmail();
@@ -118,25 +105,24 @@ public class KakaoService{
     }
 
     @Transactional
-    public LoginResponse kakaoSignIn(KakaoUserInfoResponse infoResponse, String idToken) {
+    public LoginResponse kakaoSignIn(KakaoUserInfoResponse infoResponse) {
         // 이메일로 유저를 찾음 -> 없으면 입력받은 것으로 생성
         User user = userRepository.findByEmail(infoResponse.getEmail())
-                .orElseGet(()->createNewUser(infoResponse, idToken));
-        Set<LoginType> loginTypes = user.getLoginTypes();
-        if(loginTypes.contains(LoginType.NORMAL)) {
-            user.setIdToken(idToken);
+                .orElseGet(()->createNewUser(infoResponse));
+        if (user.getKakaoId() == null){
+            // 카카오 로그인 한 적 없는 사람
+            user.setKakaoId(infoResponse.getKakaoId());
+            user.getLoginTypes().add(LoginType.KAKAO);
+            user.setModifiedAt(LocalDateTime.now());
+            user = userRepository.save(user);
         }
-        loginTypes.add(LoginType.KAKAO);
-        user.setModifiedAt(LocalDateTime.now());
-        User savedUser = userRepository.save(user);
-        return kakaoLogin(savedUser);
+        return kakaoLogin(user);
     }
 
-    public User createNewUser(KakaoUserInfoResponse request, String idToken){
+    public User createNewUser(KakaoUserInfoResponse request){
         LocalDateTime now = LocalDateTime.now();
         return User.builder()
                 .email(request.getEmail())
-                .idToken(idToken)
                 .name(request.getKakaoAccount().getProfile().getName())
                 .userStatus(UserStatus.ACTIVE)
                 .createdAt(now)
