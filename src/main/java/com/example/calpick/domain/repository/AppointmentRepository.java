@@ -15,24 +15,10 @@ import java.util.Optional;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
 
-    /*@Query("SELECT a FROM Appointment a WHERE a.receiver.userId = :receiverId AND a.appointmentStatus = :status")
-    List<Appointment> findByReceiverIdAndStatus(@Param("receiverId") Long receiverId,
-                                                @Param("status") AppointmentStatus status);*/
-
-
-    @Query("""
-    SELECT a FROM Appointment a
-    WHERE a.receiver.userId = :userId AND a.appointmentStatus = :status
-""")
-    Page<Appointment> findByReceiverIdAndStatus(
-            @Param("userId") Long userId,
-            @Param("status") AppointmentStatus status,
-            Pageable pageable
-    );
-
     @Query("""
     SELECT a FROM Appointment a
     WHERE a.receiver.userId = :userId AND a.appointmentStatus IN :statuses
+    AND (a.requester IS NULL OR a.requester.userStatus <> 'DELETED')
 """)
     Page<Appointment> findByReceiverIdAndStatuses(
             @Param("userId") Long userId,
@@ -43,6 +29,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
     @Query("""
     SELECT a FROM Appointment a
     WHERE a.requester.userId = :userId AND a.appointmentStatus IN :statuses
+    AND (a.receiver.userStatus <> 'DELETED')
 """)
     Page<Appointment> findByRequesterIdAndStatuses(
             @Param("userId") Long userId,
