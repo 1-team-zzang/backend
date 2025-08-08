@@ -34,7 +34,7 @@ public class KakaoService{
     private String kakaoClientId;
     @Value("${kakao.client.secret}")
     private String kakaoClientSecret;
-    @Value("${kakao.redirect.develop}")
+    @Value("${kakao.redirect.deploy}")
     private String redirectUrl;
 
     // 토큰 -> 사용자정보 -> 저장 및 로그인 반환
