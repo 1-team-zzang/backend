@@ -26,6 +26,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
              JOIN users u ON fr.receiver_id = u.user_id
              WHERE fr.request_status = 'ACCEPTED'
                AND fr.requester_id = :userId
+               AND u.user_status <> 'DELETED'
      
              UNION ALL
      
@@ -38,19 +39,27 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
              JOIN users u ON fr.requester_id = u.user_id
              WHERE fr.request_status = 'ACCEPTED'
                AND fr.receiver_id = :userId
+               AND u.user_status <> 'DELETED'
+
          ) AS friends
          ORDER BY name,email ASC
          """,  countQuery = """
             SELECT 
             (
                  SELECT COUNT(*) FROM friend_request fr
+                 JOIN users u ON fr.receiver_id = u.user_id
                  WHERE fr.request_status = 'ACCEPTED'
                    AND fr.requester_id = :userId
+                   AND u.user_status <> 'DELETED'
+
             ) + 
             (
                SELECT COUNT(*) FROM friend_request fr
+               JOIN users u ON fr.requester_id = u.user_id
                WHERE fr.request_status = 'ACCEPTED'
-               AND fr.receiver_id = :userId  
+               AND fr.receiver_id = :userId 
+               AND u.user_status <> 'DELETED'
+
             ) 
          """,
              nativeQuery = true)
@@ -103,12 +112,16 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
      FROM friend_request fr
      JOIN users u ON u.user_id = fr.requester_id
      WHERE fr.receiver_id = :userId AND fr.request_status = 'REQUESTED'
+     AND u.user_status <> 'DELETED'
      ORDER BY fr.created_at DESC
 
      """, countQuery = """
         SELECT COUNT(*)
         FROM friend_request fr
-        WHERE fr.receiver_id = :userId AND fr.request_status = 'REQUESTED'
+        JOIN users u ON u.user_id = fr.requester_id
+        WHERE fr.receiver_id = :userId 
+        AND fr.request_status = 'REQUESTED'
+        AND u.user_status <> 'DELETED'
         """,
              nativeQuery = true)
      Page<FriendRequestDto> getFriendRequestsList(@Param("userId") Long userId, Pageable pageable);
@@ -142,7 +155,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
            OR
            (req.receiver_id = u.user_id AND req.requester_id = :userId)
         )
-        WHERE ( (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
+        WHERE u.user_status <> 'DELETED'
+        AND ( (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
              OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
              )
         ORDER BY u.name ASC, u.email ASC
@@ -150,7 +164,8 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest,Lon
              countQuery = """
                SELECT COUNT(*)
                FROM users u
-               WHERE (
+               WHERE u.user_status <> 'DELETED'
+               AND (
                 (:searchType = 'NAME' AND u.name LIKE CONCAT('%', :query, '%'))
                 OR (:searchType = 'EMAIL' AND u.email LIKE CONCAT('%', :query, '%'))
                )
