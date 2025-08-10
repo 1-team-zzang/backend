@@ -6,6 +6,7 @@ import com.example.calpick.domain.dto.response.notification.NotificationsListRes
 import com.example.calpick.domain.entity.User;
 import com.example.calpick.domain.entity.enums.NotificationEvent;
 import com.example.calpick.domain.entity.enums.NotificationType;
+import com.example.calpick.domain.repository.AppointmentRepository;
 import com.example.calpick.domain.repository.NotificationRepository;
 import com.example.calpick.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class NotificationService {
 
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Transactional
     public NotificationsListResponseDto getNotificationsList(int page, int size,String email) {
@@ -35,18 +37,24 @@ public class NotificationService {
         List<NotificationDto> dtoList = pages.getContent().stream()
                 .map(projection -> {
                     String content;
+                    String name;
 
                     if (projection.getEvent().equals(NotificationEvent.ACCEPT.name())) {
-                        boolean isRequester = projection.getRequesterId().equals(user.getUserId());
-                        String name = isRequester ? projection.getReceiverName() : projection.getRequesterName();
 
+                        if (projection.getRequesterId() != null) {
+                            boolean isRequester = projection.getRequesterId().equals(user.getUserId());
+                            name = isRequester ? projection.getReceiverName() : projection.getRequesterName();
+                        }else{
+                            Long appointmentId = projection.getReferenceId();
+                            name = appointmentRepository.findById(appointmentId).get().getRequesterName();
+                        }
                         String prefix;
                         if (projection.getType().equals(NotificationType.APPOINTMENT.name())) {
                             prefix = "님과의 ";
                         } else if (projection.getType().equals(NotificationType.FRIEND.name())) {
                             prefix = "님과 ";
                         } else {
-                            prefix = "님과 "; // 기본값 혹은 예외 처리
+                            prefix = "님과 ";
                         }
 
                         content = name + prefix + projection.getContent();
