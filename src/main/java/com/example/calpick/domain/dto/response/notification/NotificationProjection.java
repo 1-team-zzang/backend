@@ -11,4 +11,5 @@ public interface NotificationProjection {
         String getRequesterName();
         String getReceiverName();
         String getType();
+        Long getReferenceId();
 }
