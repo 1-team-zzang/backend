@@ -15,6 +15,9 @@ public enum ErrorCode {
     APPOINTMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 약속 정보를 찾을 수 없습니다","APT-04"),
     INVALID_APPOINTMENT_TIME(HttpStatus.BAD_REQUEST, "신청은 현재 시각 이후의 시간으로만 가능합니다", "APT-06"),
     NO_ACCESS_TO_APPOINTMENT_REQUEST(HttpStatus.FORBIDDEN, "해당 약속 신청에 대한 권한이 없습니다.", "APT-07"),
+    SELF_APPOINTMENT_REQUEST_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "본인에게 약속을 신청할 수 없습니다.", "APT-08"),
+
+
 
     // SCHEDULE
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다.", "SCH-01"),

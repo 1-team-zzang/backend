@@ -17,8 +17,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
 
     @Query("""
     SELECT a FROM Appointment a
-    WHERE a.receiver.userId = :userId AND a.appointmentStatus IN :statuses
-    AND (a.requester IS NULL OR a.requester.userStatus <> 'DELETED')
+    LEFT JOIN a.requester r
+    WHERE a.receiver.userId = :userId 
+    AND (
+     (r IS NULL AND a.requesterEmail <> '')
+         OR 
+     (r IS NOT NULL AND r.userStatus <> 'DELETED')
+     )
+    AND a.appointmentStatus IN :statuses
+     
+     
 """)
     Page<Appointment> findByReceiverIdAndStatuses(
             @Param("userId") Long userId,
