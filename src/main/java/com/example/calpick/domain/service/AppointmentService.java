@@ -46,6 +46,9 @@ public class AppointmentService {
         User user = null;
         if(userDetails != null){ //회원
             user = userRepository.findByEmail(userDetails.getEmail()).get();
+            if(dto.getReceiverId() == user.getUserId()){
+                throw new CalPickException(ErrorCode.SELF_APPOINTMENT_REQUEST_NOT_ALLOWED);
+            }
         }
         User receiver = userRepository.findById(dto.getReceiverId()).get();
 
