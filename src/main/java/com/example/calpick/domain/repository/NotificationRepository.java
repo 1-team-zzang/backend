@@ -24,10 +24,11 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
         n.receiver_id AS receiverId,
         requester.name AS requesterName,
         receiver.name AS receiverName,
-        nt.type AS type
+        nt.type AS type,
+        nt.reference_id AS referenceId
     FROM notification n
-    JOIN notification_type nt ON nt.notification_id = n.notification_id
-    JOIN users requester ON requester.user_id = n.requester_id
+    LEFT JOIN notification_type nt ON nt.notification_id = n.notification_id
+    LEFT JOIN users requester ON requester.user_id = n.requester_id
     JOIN users receiver ON receiver.user_id = n.receiver_id
     WHERE 
         (n.event = 'REQUEST' AND receiver.user_id = :userId)
@@ -41,8 +42,8 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
     SELECT COUNT(*)
     FROM notification n
     JOIN notification_type nt ON nt.notification_id = n.notification_id
-    JOIN users requester ON requester.user_id = n.requester_id
-    JOIN users receiver ON receiver.user_id = n.receiver_id
+    LEFT JOIN users requester ON requester.user_id = n.requester_id
+    LEFT JOIN users receiver ON receiver.user_id = n.receiver_id
     WHERE 
         (n.event = 'REQUEST' AND receiver.user_id = :userId)
         OR
