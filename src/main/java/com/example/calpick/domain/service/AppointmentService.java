@@ -71,7 +71,7 @@ public class AppointmentService {
         appointment.setAppointmentId(null);
         appointment.setAppointmentStatus(AppointmentStatus.REQUESTED);
         appointment.setColor(fromString(ColorTypes.class, dto.getColor()));
-        if(dto.requesterEmail.isEmpty()){ //요청자가 회원일경우
+        if(user!=null){ //요청자가 회원일경우
             appointment.setRequester(user);
             appointment.setRequesterName(user.getName());
         }
